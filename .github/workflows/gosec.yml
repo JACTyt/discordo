@@ -16,3 +16,4 @@ jobs:
 
       - name: Run GoSec Scan
         run: gosec ./...
+        timeout: 5m
