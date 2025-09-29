@@ -2,39 +2,65 @@ name: Style check
 on: [push, pull_request]
 
 jobs:
-  lint:
-      runs-on: [ubuntu-latest]
-      steps:
+  go-setup:
+    runs-on: ubuntu-latest
+    outputs:
+      go-cache-key: ${{ steps.cache-go.outputs.cache-hit }}
+    steps:
       - uses: actions/checkout@v3
 
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
           go-version: 1.25
-      
-      - name: Install libx11-dev for clipboard support
-        if: runner.os == 'Linux'
-        run: sudo apt install libx11-dev
 
+      - name: Cache Go modules
+        id: cache-go
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: go-modules-${{ runner.os }}-${{ hashFiles('**/go.sum') }}
+
+      - name: Install tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libx11-dev
+          go install golang.org/x/tools/cmd/goimports@latest
+          go install github.com/mgechev/revive@latest
+          go install honnef.co/go/tools/cmd/staticcheck@latest
+
+  go-vet:
+    runs-on: ubuntu-latest
+    needs: go-setup
+    steps:
+      - uses: actions/checkout@v3
       - name: Run go vet
         run: go vet ./...
 
-      - name: Install goimports
-        run: go install golang.org/x/tools/cmd/goimports@latest
-
-      - name: Check formatting with gofmt and goimports
+  go-format:
+    runs-on: ubuntu-latest
+    needs: go-setup
+    steps:
+      - uses: actions/checkout@v3
+      - name: Check formatting
         run: |
           gofmt -l .
           goimports -l .
 
-      - name: Install revive
-        run: go install github.com/mgechev/revive@latest
-
+  revive-lint:
+    runs-on: ubuntu-latest
+    needs: go-setup
+    steps:
+      - uses: actions/checkout@v3
       - name: Run revive
         run: revive ./...
 
-      - name: Install staticcheck
-        run: go install honnef.co/go/tools/cmd/staticcheck@latest
-
+  staticcheck-lint:
+    runs-on: ubuntu-latest
+    needs: go-setup
+    steps:
+      - uses: actions/checkout@v3
       - name: Run staticcheck
         run: staticcheck ./...
