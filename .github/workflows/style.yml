@@ -12,6 +12,10 @@ jobs:
         with:
           go-version: 1.25
       
+      - name: Install libx11-dev for clipboard support
+        if: runner.os == 'Linux'
+        run: sudo apt install libx11-dev
+
       - name: Run go vet
         run: go vet ./...
       - name: Check formatting
