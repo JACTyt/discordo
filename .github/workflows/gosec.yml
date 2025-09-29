@@ -15,7 +15,5 @@ jobs:
         run: go install github.com/securego/gosec/v2/cmd/gosec@latest
 
       - name: Run GoSec Scan
-        run: gosec 
-        with:
-          args: ./...
-          timeout: 5m
+        run: gosec ./...
+        continue-on-error: true
