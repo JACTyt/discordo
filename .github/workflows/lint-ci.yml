@@ -17,4 +17,6 @@ jobs:
         with:
           version: latest
           args: ./...
+          skip-cache: true
+
 
