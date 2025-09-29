@@ -1,4 +1,4 @@
-name: GoSec Scan
+name: GoSec Security Scan
 on: [push , pull_request]
 
 jobs:
