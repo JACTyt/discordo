@@ -23,7 +23,7 @@ jobs:
             ~/go/pkg/mod
           key: go-modules-${{ runner.os }}-${{ hashFiles('**/go.sum') }}
 
-      - name: Install tools
+      - name: Install dependencies and tools
         run: |
           sudo apt-get update
           sudo apt-get install -y libx11-dev
@@ -36,6 +36,8 @@ jobs:
     needs: go-setup
     steps:
       - uses: actions/checkout@v3
+      - name: Add Go bin to PATH
+        run: echo "$HOME/go/bin" >> $GITHUB_PATH
       - name: Run go vet
         run: go vet ./...
 
@@ -44,6 +46,8 @@ jobs:
     needs: go-setup
     steps:
       - uses: actions/checkout@v3
+      - name: Add Go bin to PATH
+        run: echo "$HOME/go/bin" >> $GITHUB_PATH
       - name: Check formatting
         run: |
           gofmt -l .
@@ -54,6 +58,8 @@ jobs:
     needs: go-setup
     steps:
       - uses: actions/checkout@v3
+      - name: Add Go bin to PATH
+        run: echo "$HOME/go/bin" >> $GITHUB_PATH
       - name: Run revive
         run: revive ./...
 
@@ -62,5 +68,7 @@ jobs:
     needs: go-setup
     steps:
       - uses: actions/checkout@v3
+      - name: Add Go bin to PATH
+        run: echo "$HOME/go/bin" >> $GITHUB_PATH
       - name: Run staticcheck
         run: staticcheck ./...
