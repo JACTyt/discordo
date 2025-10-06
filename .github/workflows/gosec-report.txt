@@ -1,0 +1,446 @@
+Results:
+
+
+[D:\GitHub\discordo\cmd\message_input.go:373] - G115 (CWE-190): integer overflow conversion uint -> int (Confidence: MEDIUM, Severity: HIGH)
+    372:        y -= h
+  > 373:        w := int(mi.cfg.Theme.MentionsList.MinWidth)
+    374:        if w == 0 {
+
+Autofix:
+
+[D:\GitHub\discordo\cmd\message_input.go:367] - G115 (CWE-190): integer overflow conversion uint -> int (Confidence: MEDIUM, Severity: HIGH)
+    366:        _, _, maxW, maxH := app.messagesList.GetInnerRect()
+  > 367:        if t := int(mi.cfg.Theme.MentionsList.MaxHeight); t != 0 {
+    368:                maxH = min(maxH, t)
+
+Autofix:
+
+[D:\GitHub\discordo\cmd\message_input.go:451] - G204 (CWE-78): Subprocess launched with a potential tainted input or cmd arguments (Confidence: HIGH, Severity: MEDIUM)
+    450:
+  > 451:        cmd := exec.Command(mi.cfg.Editor, file.Name())
+    452:        cmd.Stdin = os.Stdin
+
+Autofix:
+
+[D:\GitHub\discordo\internal\notifications\notifications.go:88] - G304 (CWE-22): Potential file inclusion via variable (Confidence: HIGH, Severity: MEDIUM)
+    87:
+  > 88:         file, err := os.Create(path)
+    89:         if err != nil {
+
+Autofix: Consider using os.Root to scope file access under a fixed root (Go >=1.24). Prefer root.Open/root.Stat over os.Open/os.Stat to prevent directory traversal.
+
+[D:\GitHub\discordo\internal\logger\logger.go:25] - G304 (CWE-22): Potential file inclusion via variable (Confidence: HIGH, Severity: MEDIUM)
+    24:
+  > 25:         file, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, os.ModePerm)
+    26:         if err != nil {
+
+Autofix: Consider using os.Root to scope file access under a fixed root (Go >=1.24). Prefer root.Open/root.Stat over os.Open/os.Stat to prevent directory traversal.
+
+[D:\GitHub\discordo\internal\config\config.go:79] - G304 (CWE-22): Potential file inclusion via variable (Confidence: HIGH, Severity: MEDIUM)
+    78:
+  > 79:         file, err := os.Open(path)
+    80:         if os.IsNotExist(err) {
+
+Autofix: Consider using os.Root to scope file access under a fixed root (Go >=1.24). Prefer root.Open/root.Stat over os.Open/os.Stat to prevent directory traversal.
+
+[D:\GitHub\discordo\cmd\messages_list.go:503] - G304 (CWE-22): Potential file inclusion via variable (Confidence: HIGH, Severity: MEDIUM)    502:        path = filepath.Join(path, attachment.Filename)
+  > 503:        file, err := os.Create(path)
+    504:        if err != nil {
+
+Autofix: Consider using os.Root to scope file access under a fixed root (Go >=1.24). Prefer root.Open/root.Stat over os.Open/os.Stat to prevent directory traversal.
+
+[D:\GitHub\discordo\cmd\message_input.go:494] - G304 (CWE-22): Potential file inclusion via variable (Confidence: HIGH, Severity: MEDIUM)    493:        for _, path := range paths {
+  > 494:                file, err := os.Open(path)
+    495:                if err != nil {
+
+Autofix: Consider using os.Root to scope file access under a fixed root (Go >=1.24). Prefer root.Open/root.Stat over os.Open/os.Stat to prevent directory traversal.
+
+[D:\GitHub\discordo\internal\notifications\notifications.go:94] - G107 (CWE-88): Potential HTTP request made with variable url (Confidence: MEDIUM, Severity: MEDIUM)
+    93:
+  > 94:         resp, err := http.Get(url)
+    95:         if err != nil {
+
+Autofix:
+
+[D:\GitHub\discordo\internal\logger\logger.go:25] - G302 (CWE-276): Expect file permissions to be 0600 or less (Confidence: HIGH, Severity: MEDIUM)
+    24:
+  > 25:         file, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, os.ModePerm)
+    26:         if err != nil {
+
+Autofix:
+
+[D:\GitHub\discordo\internal\notifications\notifications.go:79] - G301 (CWE-276): Expect directory permissions to be 0750 or less (Confidence: HIGH, Severity: MEDIUM)
+    78:         path := filepath.Join(consts.CacheDir(), "avatars")
+  > 79:         if err := os.MkdirAll(path, os.ModePerm); err != nil {
+    80:                 return "", err
+
+Autofix:
+
+[D:\GitHub\discordo\internal\logger\logger.go:21] - G301 (CWE-276): Expect directory permissions to be 0750 or less (Confidence: HIGH, Severity: MEDIUM)
+    20: func Load(path string, level slog.Level) error {
+  > 21:         if err := os.MkdirAll(filepath.Dir(path), os.ModePerm); err != nil {
+    22:                 return err
+
+Autofix:
+
+[D:\GitHub\discordo\internal\consts\consts.go:25] - G301 (CWE-276): Expect directory permissions to be 0750 or less (Confidence: HIGH, Severity: MEDIUM)
+    24:         cacheDir = filepath.Join(userCacheDir, Name)
+  > 25:         if err := os.MkdirAll(cacheDir, os.ModePerm); err != nil {
+    26:                 slog.Error("failed to create cache dir", "err", err, "path", cacheDir)
+
+Autofix:
+
+[D:\GitHub\discordo\cmd\messages_list.go:497] - G301 (CWE-276): Expect directory permissions to be 0750 or less (Confidence: HIGH, Severity: MEDIUM)
+    496:        path := filepath.Join(consts.CacheDir(), "attachments")
+  > 497:        if err := os.MkdirAll(path, os.ModePerm); err != nil {
+    498:                slog.Error("failed to create attachments dir", "err", err, "path", path)
+
+Autofix:
+
+[D:\GitHub\discordo\internal\markdown\renderer.go:200] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    199:        } else {
+  > 200:                io.WriteString(w, "[-:-]")
+    201:        }
+
+Autofix:
+
+[D:\GitHub\discordo\internal\markdown\renderer.go:198] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    197:                fmt.Fprintf(w, "[%s:%s]", fg, bg)
+  > 198:                io.WriteString(w, ":"+node.Name+":")
+    199:        } else {
+
+Autofix:
+
+[D:\GitHub\discordo\internal\markdown\renderer.go:190] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    189:        } else {
+  > 190:                io.WriteString(w, "[-:-:B]")
+    191:        }
+
+Autofix:
+
+[D:\GitHub\discordo\internal\markdown\renderer.go:187] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    186:                case node.GuildRole != nil:
+  > 187:                        io.WriteString(w, "@"+node.GuildRole.Name)
+    188:                }
+
+Autofix:
+
+[D:\GitHub\discordo\internal\markdown\renderer.go:185] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    184:
+  > 185:                        io.WriteString(w, "@"+name)
+    186:                case node.GuildRole != nil:
+
+Autofix:
+
+[D:\GitHub\discordo\internal\markdown\renderer.go:178] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    177:                case node.Channel != nil:
+  > 178:                        io.WriteString(w, "#"+node.Channel.Name)
+    179:                case node.GuildUser != nil:
+
+Autofix:
+
+[D:\GitHub\discordo\internal\markdown\renderer.go:167] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    166:        } else {
+  > 167:                io.WriteString(w, end)
+    168:        }
+
+Autofix:
+
+[D:\GitHub\discordo\internal\markdown\renderer.go:165] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    164:        if start, end := attrToTag(node.Attr); entering && start != "" {
+  > 165:                io.WriteString(w, start)
+    166:        } else {
+
+Autofix:
+
+[D:\GitHub\discordo\internal\markdown\renderer.go:159] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    158:                case node.SoftLineBreak():
+  > 159:                        io.WriteString(w, tview.NewLine)
+    160:                }
+
+Autofix:
+
+[D:\GitHub\discordo\internal\markdown\renderer.go:157] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    156:                case node.HardLineBreak():
+  > 157:                        io.WriteString(w, strings.Repeat(tview.NewLine, 2))
+    158:                case node.SoftLineBreak():
+
+Autofix:
+
+[D:\GitHub\discordo\internal\markdown\renderer.go:154] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    153:        if entering {
+  > 154:                w.Write(node.Segment.Value(source))
+    155:                switch {
+
+Autofix:
+
+[D:\GitHub\discordo\internal\markdown\renderer.go:148] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    147:        } else {
+  > 148:                io.WriteString(w, tview.NewLine)
+    149:        }
+
+Autofix:
+
+[D:\GitHub\discordo\internal\markdown\renderer.go:145] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    144:                } else {
+  > 145:                        io.WriteString(w, "- ")
+    146:                }
+
+Autofix:
+
+[D:\GitHub\discordo\internal\markdown\renderer.go:142] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    141:                        io.WriteString(w, strconv.Itoa(*r.listIx))
+  > 142:                        io.WriteString(w, ". ")
+    143:                        *r.listIx++
+
+Autofix:
+
+[D:\GitHub\discordo\internal\markdown\renderer.go:141] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    140:                if r.listIx != nil {
+  > 141:                        io.WriteString(w, strconv.Itoa(*r.listIx))
+    142:                        io.WriteString(w, ". ")
+
+Autofix:
+
+[D:\GitHub\discordo\internal\markdown\renderer.go:138] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    137:        if entering {
+  > 138:                io.WriteString(w, strings.Repeat("  ", r.listNested-1))
+    139:
+
+Autofix:
+
+[D:\GitHub\discordo\internal\markdown\renderer.go:129] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    128:        if entering {
+  > 129:                io.WriteString(w, tview.NewLine)
+    130:                r.listNested++
+
+Autofix:
+
+[D:\GitHub\discordo\internal\markdown\renderer.go:117] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    116:        } else {
+  > 117:                io.WriteString(w, "[-:-::-]")
+    118:        }
+
+Autofix:
+
+[D:\GitHub\discordo\internal\markdown\renderer.go:108] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    107:        } else {
+  > 108:                io.WriteString(w, "[-:-]")
+    109:        }
+
+Autofix:
+
+[D:\GitHub\discordo\internal\markdown\renderer.go:106] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    105:                fmt.Fprintf(w, "[%s:%s]", fg, bg)
+  > 106:                w.Write(node.URL(source))
+    107:        } else {
+
+Autofix:
+
+[D:\GitHub\discordo\internal\markdown\renderer.go:97] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    96:                         io.WriteString(w, "| ")
+  > 97:                         w.Write(line.Value(source))
+    98:                 }
+
+Autofix:
+
+[D:\GitHub\discordo\internal\markdown\renderer.go:96] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    95:                         line := lines.At(i)
+  > 96:                         io.WriteString(w, "| ")
+    97:                         w.Write(line.Value(source))
+
+Autofix:
+
+[D:\GitHub\discordo\internal\markdown\renderer.go:89] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    88:                         w.Write(l)
+  > 89:                         io.WriteString(w, tview.NewLine)
+    90:                 }
+
+Autofix:
+
+[D:\GitHub\discordo\internal\markdown\renderer.go:88] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    87:                         io.WriteString(w, "|=> ")
+  > 88:                         w.Write(l)
+    89:                         io.WriteString(w, tview.NewLine)
+
+Autofix:
+
+[D:\GitHub\discordo\internal\markdown\renderer.go:87] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    86:                 if l := node.Language(source); l != nil {
+  > 87:                         io.WriteString(w, "|=> ")
+    88:                         w.Write(l)
+
+Autofix:
+
+[D:\GitHub\discordo\internal\markdown\renderer.go:82] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    81: func (r *renderer) renderFencedCodeBlock(w io.Writer, node *ast.FencedCodeBlock, entering bool, source []byte) {
+  > 82:         io.WriteString(w, tview.NewLine)
+    83:
+
+Autofix:
+
+[D:\GitHub\discordo\internal\markdown\renderer.go:77] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    76:         } else {
+  > 77:                 io.WriteString(w, tview.NewLine)
+    78:         }
+
+Autofix:
+
+[D:\GitHub\discordo\internal\markdown\renderer.go:75] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    74:                 io.WriteString(w, strings.Repeat("#", node.Level))
+  > 75:                 io.WriteString(w, " ")
+    76:         } else {
+
+Autofix:
+
+[D:\GitHub\discordo\internal\markdown\renderer.go:74] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    73:         if entering {
+  > 74:                 io.WriteString(w, strings.Repeat("#", node.Level))
+    75:                 io.WriteString(w, " ")
+
+Autofix:
+
+[D:\GitHub\discordo\internal\http\transport.go:40] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    39:                 if err != nil {
+  > 40:                         resp.Body.Close()
+    41:                         return nil, err
+
+Autofix:
+
+[D:\GitHub\discordo\internal\http\transport.go:32] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    31:                 if err != nil {
+  > 32:                         resp.Body.Close()
+    33:                         return nil, err
+
+Autofix:
+
+[D:\GitHub\discordo\cmd\messages_list.go:427-438] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    426:        var urls []string
+  > 427:        ast.Walk(node, func(n ast.Node, entering bool) (ast.WalkStatus, error) {
+  > 428:                if entering {
+  > 429:                        switch n := n.(type) {
+  > 430:                        case *ast.AutoLink:
+  > 431:                                urls = append(urls, string(n.URL(src)))
+  > 432:                        case *ast.Link:
+  > 433:                                urls = append(urls, string(n.Destination))
+  > 434:                        }
+  > 435:                }
+  > 436:
+  > 437:                return ast.WalkContinue, nil
+  > 438:        })
+    439:        return urls
+
+Autofix:
+
+[D:\GitHub\discordo\cmd\messages_list.go:226] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    225:
+  > 226:        io.WriteString(ml, tview.NewLine)
+    227:        // main
+
+Autofix:
+
+[D:\GitHub\discordo\cmd\messages_list.go:223] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    222:        } else {
+  > 223:                io.WriteString(ml, "Original message was deleted")
+    224:        }
+
+Autofix:
+
+[D:\GitHub\discordo\cmd\messages_list.go:192] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    191:        if message.EditedTimestamp.IsValid() {
+  > 192:                io.WriteString(ml, " [::d](edited)[::D]")
+    193:        }
+
+Autofix:
+
+[D:\GitHub\discordo\cmd\messages_list.go:180] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    179:        // discordmd doesn't support MessageSnapshotMessage, so we just use write it as is. todo?
+  > 180:        ml.Write(c)
+    181: }
+
+Autofix:
+
+[D:\GitHub\discordo\cmd\messages_list.go:173] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    172:        } else {
+  > 173:                ml.Write(c) // write the content as is
+    174:        }
+
+Autofix:
+
+[D:\GitHub\discordo\cmd\messages_list.go:171] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    170:                ast := discordmd.ParseWithMessage(c, *discordState.Cabinet, &msg, false)
+  > 171:                markdown.DefaultRenderer.Render(ml, c, ast)
+    172:        } else {
+
+Autofix:
+
+[D:\GitHub\discordo\cmd\messages_list.go:109] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    108:        // reset
+  > 109:        io.WriteString(ml, "[-:-:-]")
+    110:
+
+Autofix:
+
+[D:\GitHub\discordo\cmd\messages_list.go:103] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    102:                if isBlocked {
+  > 103:                        io.WriteString(ml, "[:red:b]Blocked message[:-:-]")
+    104:                        return
+
+Autofix:
+
+[D:\GitHub\discordo\cmd\message_input.go:449] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    448:
+  > 449:        file.WriteString(mi.GetText())
+    450:
+
+Autofix:
+
+[D:\GitHub\discordo\cmd\message_input.go:215-222] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    214:                name := strings.ToLower(string(input[1:]))
+  > 215:                discordState.MemberStore.Each(app.guildsTree.selectedGuildID, func(m *discord.Member) bool {
+  > 216:                        if strings.ToLower(m.User.Username) == name && channelHasUser(cID, m.User.ID) {
+  > 217:                                output = []byte(m.User.ID.Mention())
+  > 218:                                return true
+  > 219:                        }
+  > 220:
+  > 221:                        return false
+  > 222:                })
+    223:
+
+Autofix:
+
+[D:\GitHub\discordo\cmd\message_input.go:187-202] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    186:
+  > 187:        ast.Walk(discordmd.Parse(src), func(node ast.Node, enter bool) (ast.WalkStatus, error) {
+  > 188:                switch node := node.(type) {
+  > 189:                case *ast.CodeBlock:
+  > 190:                        canMention = !enter
+  > 191:                case *discordmd.Inline:
+  > 192:                        if (node.Attr & discordmd.AttrMonospace) != 0 {
+  > 193:                                canMention = !enter
+  > 194:                        }
+  > 195:                case *ast.Text:
+  > 196:                        if canMention {
+  > 197:                                ranges = append(ranges, [2]int{node.Segment.Start,
+  > 198:                                        node.Segment.Stop})
+  > 199:                        }
+  > 200:                }
+  > 201:                return ast.WalkContinue, nil
+  > 202:        })
+    203:
+
+Autofix:
+
+[D:\GitHub\discordo\cmd\message_input.go:172] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    171:                if closer, ok := file.Reader.(io.Closer); ok {
+  > 172:                        closer.Close()
+    173:                }
+
+Autofix:
+
+Summary:
+  Gosec  : dev
+  Files  : 23
+  Lines  : 3031
+  Nosec  : 0
+  Issues : 58
