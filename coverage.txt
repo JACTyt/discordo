@@ -1,0 +1,11 @@
+        github.com/ayn2op/discordo              coverage: 0.0% of statements
+ok      github.com/ayn2op/discordo/cmd  (cached)        coverage: 9.5% of statements
+        github.com/ayn2op/discordo/internal/cache               coverage: 0.0% of statements
+        github.com/ayn2op/discordo/internal/config              coverage: 0.0% of statements
+        github.com/ayn2op/discordo/internal/consts              coverage: 0.0% of statements
+ok      github.com/ayn2op/discordo/internal/http        (cached)        coverage: 82.6% of statements
+ok      github.com/ayn2op/discordo/internal/logger      (cached)        coverage: 100.0% of statements
+        github.com/ayn2op/discordo/internal/login               coverage: 0.0% of statements
+        github.com/ayn2op/discordo/internal/markdown            coverage: 0.0% of statements
+        github.com/ayn2op/discordo/internal/notifications               coverage: 0.0% of statements
+        github.com/ayn2op/discordo/internal/ui          coverage: 0.0% of statements
