@@ -3,6 +3,7 @@ package logger
 import (
 	"bytes"
 	"log/slog"
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -45,4 +46,36 @@ func TestLoad_CreatesFileAndLogs(t *testing.T) {
 func TestDefaultPath(t *testing.T) {
 	path := DefaultPath()
 	assert.Equal(t, filepath.Base(path), fileName, "Default File name must be %s", fileName)
+}
+
+func TestLoad_RealFileSystem_Success(t *testing.T) {
+	tmpDir := os.TempDir()
+	logPath := filepath.Join(tmpDir, "test.log")
+
+	err := Load(logPath, slog.LevelInfo)
+	assert.NoError(t, err, "Load should not return an error")
+
+	slog.Info("hello world")
+
+	data, err := os.ReadFile(logPath)
+	assert.NoError(t, err, "Failed to read log file")
+	assert.NotEmpty(t, data, "Log file should have content message")
+}
+
+func TestLoad_RealFileSystem_Fail_WrongDirectory(t *testing.T) {
+	tmpDir := os.TempDir()
+	logPath := filepath.Join(tmpDir, "not-a-director:y.txt/test.log")
+
+	err := Load(logPath, slog.LevelInfo)
+	assert.Error(t, err, "Load should return an error")
+}
+
+func TestLoad_RealFileSystem_Fail_NoFilePermission(t *testing.T) {
+	logPath := "C:\\Windows\\system32\\test.log"
+
+	Load(logPath, slog.LevelInfo)
+
+	file, err := os.OpenFile(logPath, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0000)
+	assert.Error(t, err, "Opening log file should fail")
+	defer file.Close()
 }

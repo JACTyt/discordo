@@ -14,6 +14,21 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestTransport_GotError(t *testing.T) {
+	msg := "message_no_encoding"
+	ts := httptest.NewServer(stdHttp.HandlerFunc(func(writer stdHttp.ResponseWriter, request *stdHttp.Request) {
+		writer.Write([]byte(msg))
+	}))
+	defer ts.Close()
+
+	tr := http.NewTransport()
+	assert.NotNil(t, tr, "Transport should not be nil")
+
+	client := &stdHttp.Client{Transport: tr}
+	_, err := client.Get("http://dont-exist-url")
+	assert.Error(t, err)
+}
+
 // Test plain, non-encoded response
 func TestTransport_NoEncoding(t *testing.T) {
 	msg := "message_no_encoding"
