@@ -1,0 +1,3110 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>cmd: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/ayn2op/discordo/cmd/application.go (0.0%)</option>
+				
+				<option value="file1">github.com/ayn2op/discordo/cmd/guilds_tree.go (5.9%)</option>
+				
+				<option value="file2">github.com/ayn2op/discordo/cmd/message_input.go (0.0%)</option>
+				
+				<option value="file3">github.com/ayn2op/discordo/cmd/messages_list.go (24.1%)</option>
+				
+				<option value="file4">github.com/ayn2op/discordo/cmd/root.go (0.0%)</option>
+				
+				<option value="file5">github.com/ayn2op/discordo/cmd/state.go (0.0%)</option>
+				
+				<option value="file6">github.com/ayn2op/discordo/internal/cache/cache.go (0.0%)</option>
+				
+				<option value="file7">github.com/ayn2op/discordo/internal/config/border.go (0.0%)</option>
+				
+				<option value="file8">github.com/ayn2op/discordo/internal/config/config.go (0.0%)</option>
+				
+				<option value="file9">github.com/ayn2op/discordo/internal/config/theme.go (0.0%)</option>
+				
+				<option value="file10">github.com/ayn2op/discordo/internal/consts/consts.go (0.0%)</option>
+				
+				<option value="file11">github.com/ayn2op/discordo/internal/http/client.go (100.0%)</option>
+				
+				<option value="file12">github.com/ayn2op/discordo/internal/http/headers.go (100.0%)</option>
+				
+				<option value="file13">github.com/ayn2op/discordo/internal/http/props.go (87.5%)</option>
+				
+				<option value="file14">github.com/ayn2op/discordo/internal/http/transport.go (63.2%)</option>
+				
+				<option value="file15">github.com/ayn2op/discordo/internal/logger/logger.go (100.0%)</option>
+				
+				<option value="file16">github.com/ayn2op/discordo/internal/login/form.go (0.0%)</option>
+				
+				<option value="file17">github.com/ayn2op/discordo/internal/markdown/renderer.go (0.0%)</option>
+				
+				<option value="file18">github.com/ayn2op/discordo/internal/notifications/desktop_toast.go (0.0%)</option>
+				
+				<option value="file19">github.com/ayn2op/discordo/internal/notifications/notifications.go (0.0%)</option>
+				
+				<option value="file20">github.com/ayn2op/discordo/internal/ui/util.go (0.0%)</option>
+				
+				<option value="file21">github.com/ayn2op/discordo/main.go (0.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package cmd
+
+import (
+        "log/slog"
+
+        "github.com/ayn2op/discordo/internal/config"
+        "github.com/ayn2op/discordo/internal/consts"
+        "github.com/ayn2op/discordo/internal/login"
+        "github.com/ayn2op/tview"
+        "github.com/gdamore/tcell/v2"
+        "github.com/zalando/go-keyring"
+)
+
+const (
+        flexPageName            = "flex"
+        mentionsListPageName    = "mentionsList"
+        attachmentsListPageName = "attachmentsList"
+)
+
+type application struct {
+        cfg *config.Config
+
+        *tview.Application
+        pages        *tview.Pages
+        flex         *tview.Flex
+        guildsTree   *guildsTree
+        messagesList *messagesList
+        messageInput *messageInput
+}
+
+func newApplication(cfg *config.Config) *application <span class="cov0" title="0">{
+        app := &amp;application{
+                cfg: cfg,
+
+                Application:  tview.NewApplication(),
+                pages:        tview.NewPages(),
+                flex:         tview.NewFlex(),
+                guildsTree:   newGuildsTree(cfg),
+                messagesList: newMessagesList(cfg),
+                messageInput: newMessageInput(cfg),
+        }
+
+        app.flex.SetInputCapture(app.onFlexInputCapture)
+        app.
+                EnableMouse(cfg.Mouse).
+                SetInputCapture(app.onInputCapture)
+        return app
+}</span>
+
+func (a *application) run(token string) error <span class="cov0" title="0">{
+        if token == "" </span><span class="cov0" title="0">{
+                loginForm := login.NewForm(a.cfg, func(token string) </span><span class="cov0" title="0">{
+                        if err := a.run(token); err != nil </span><span class="cov0" title="0">{
+                                slog.Error("failed to run application", "err", err)
+                        }</span>
+                })
+
+                <span class="cov0" title="0">return a.SetRoot(loginForm, true).Run()</span>
+        }
+
+        <span class="cov0" title="0">if err := openState(token); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov0" title="0">a.init()
+        return a.SetRoot(a.pages, true).Run()</span>
+}
+
+func (a *application) quit() <span class="cov0" title="0">{
+        if discordState != nil </span><span class="cov0" title="0">{
+                if err := discordState.Close(); err != nil </span><span class="cov0" title="0">{
+                        slog.Error("failed to close the session", "err", err)
+                }</span>
+        }
+
+        <span class="cov0" title="0">a.Stop()</span>
+}
+
+func (a *application) init() <span class="cov0" title="0">{
+        a.pages.ClearPages()
+        a.flex.Clear()
+
+        right := tview.NewFlex().
+                SetDirection(tview.FlexRow).
+                AddItem(a.messagesList, 0, 1, false).
+                AddItem(a.messageInput, 3, 1, false)
+
+        // The guilds tree is always focused first at start-up.
+        a.flex.
+                AddItem(a.guildsTree, 0, 1, true).
+                AddItem(right, 0, 4, false)
+
+        a.pages.AddAndSwitchToPage(flexPageName, a.flex, true)
+}</span>
+
+func (a *application) onInputCapture(event *tcell.EventKey) *tcell.EventKey <span class="cov0" title="0">{
+        switch event.Name() </span>{
+        case a.cfg.Keys.Quit:<span class="cov0" title="0">
+                a.quit()
+                return nil</span>
+        case "Ctrl+C":<span class="cov0" title="0">
+                // https://github.com/ayn2op/tview/blob/a64fc48d7654432f71922c8b908280cdb525805c/application.go#L153
+                return tcell.NewEventKey(tcell.KeyCtrlC, 0, tcell.ModNone)</span>
+        }
+
+        <span class="cov0" title="0">return event</span>
+}
+
+func (a *application) toggleGuildsTree() <span class="cov0" title="0">{
+        // The guilds tree is visible if the number of items is two.
+        if a.flex.GetItemCount() == 2 </span><span class="cov0" title="0">{
+                a.flex.RemoveItem(a.guildsTree)
+                if a.guildsTree.HasFocus() </span><span class="cov0" title="0">{
+                        a.SetFocus(a.flex)
+                }</span>
+        } else<span class="cov0" title="0"> {
+                a.init()
+                a.SetFocus(a.guildsTree)
+        }</span>
+}
+
+func (a *application) onFlexInputCapture(event *tcell.EventKey) *tcell.EventKey <span class="cov0" title="0">{
+        switch event.Name() </span>{
+        case a.cfg.Keys.FocusGuildsTree:<span class="cov0" title="0">
+                a.messageInput.removeMentionsList()
+                // The guilds tree is not hidden if the number of items is two.
+                if a.flex.GetItemCount() == 2 </span><span class="cov0" title="0">{
+                        a.SetFocus(a.guildsTree)
+                }</span>
+                <span class="cov0" title="0">return nil</span>
+        case a.cfg.Keys.FocusMessagesList:<span class="cov0" title="0">
+                a.messageInput.removeMentionsList()
+                a.SetFocus(a.messagesList)
+                return nil</span>
+        case a.cfg.Keys.FocusMessageInput:<span class="cov0" title="0">
+                a.SetFocus(a.messageInput)
+                return nil</span>
+        case a.cfg.Keys.Logout:<span class="cov0" title="0">
+                a.quit()
+
+                if err := keyring.Delete(consts.Name, "token"); err != nil </span><span class="cov0" title="0">{
+                        slog.Error("failed to delete token from keyring", "err", err)
+                        return nil
+                }</span>
+
+                <span class="cov0" title="0">return nil</span>
+        case a.cfg.Keys.ToggleGuildsTree:<span class="cov0" title="0">
+                a.toggleGuildsTree()
+                return nil</span>
+        }
+
+        <span class="cov0" title="0">return event</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package cmd
+
+import (
+        "fmt"
+        "log/slog"
+        "sort"
+
+        "github.com/ayn2op/discordo/internal/config"
+        "github.com/ayn2op/discordo/internal/ui"
+        "github.com/ayn2op/tview"
+        "github.com/diamondburned/arikawa/v3/discord"
+        "github.com/diamondburned/arikawa/v3/gateway"
+        "github.com/diamondburned/ningen/v3"
+        "github.com/gdamore/tcell/v2"
+        "golang.design/x/clipboard"
+)
+
+type guildsTree struct {
+        *tview.TreeView
+        cfg               *config.Config
+        selectedChannelID discord.ChannelID
+        selectedGuildID   discord.GuildID
+}
+
+func newGuildsTree(cfg *config.Config) *guildsTree <span class="cov0" title="0">{
+        gt := &amp;guildsTree{
+                TreeView: tview.NewTreeView(),
+                cfg:      cfg,
+        }
+
+        gt.Box = ui.ConfigureBox(gt.Box, &amp;cfg.Theme)
+        gt.
+                SetRoot(tview.NewTreeNode("")).
+                SetTopLevel(1).
+                SetGraphics(cfg.Theme.GuildsTree.Graphics).
+                SetGraphicsColor(tcell.GetColor(cfg.Theme.GuildsTree.GraphicsColor)).
+                SetSelectedFunc(gt.onSelected).
+                SetTitle("Guilds").
+                SetInputCapture(gt.onInputCapture)
+
+        return gt
+}</span>
+
+func (gt *guildsTree) createFolderNode(folder gateway.GuildFolder) <span class="cov0" title="0">{
+        name := "Folder"
+        if folder.Name != "" </span><span class="cov0" title="0">{
+                name = fmt.Sprintf("[%s]%s[-]", folder.Color, folder.Name)
+        }</span>
+
+        <span class="cov0" title="0">folderNode := tview.NewTreeNode(name).SetExpanded(gt.cfg.Theme.GuildsTree.AutoExpandFolders)
+        gt.GetRoot().AddChild(folderNode)
+
+        for _, gID := range folder.GuildIDs </span><span class="cov0" title="0">{
+                guild, err := discordState.Cabinet.Guild(gID)
+                if err != nil </span><span class="cov0" title="0">{
+                        slog.Error("failed to get guild from state", "guild_id", gID, "err", err)
+                        continue</span>
+                }
+
+                <span class="cov0" title="0">gt.createGuildNode(folderNode, *guild)</span>
+        }
+}
+
+func (gt *guildsTree) unreadStyle(indication ningen.UnreadIndication) tcell.Style <span class="cov8" title="1">{
+        var style tcell.Style
+        switch indication </span>{
+        case ningen.ChannelRead:<span class="cov8" title="1">
+                style = style.Dim(true)</span>
+        case ningen.ChannelMentioned:<span class="cov8" title="1">
+                style = style.Underline(true)
+                fallthrough</span>
+        case ningen.ChannelUnread:<span class="cov8" title="1">
+                style = style.Bold(true)</span>
+        }
+
+        <span class="cov8" title="1">return style</span>
+}
+
+func (gt *guildsTree) getGuildNodeStyle(guildID discord.GuildID) tcell.Style <span class="cov0" title="0">{
+        indication := discordState.GuildIsUnread(guildID, ningen.GuildUnreadOpts{UnreadOpts: ningen.UnreadOpts{IncludeMutedCategories: true}})
+        return gt.unreadStyle(indication)
+}</span>
+
+func (gt *guildsTree) getChannelNodeStyle(channelID discord.ChannelID) tcell.Style <span class="cov0" title="0">{
+        indication := discordState.ChannelIsUnread(channelID, ningen.UnreadOpts{IncludeMutedCategories: true})
+        return gt.unreadStyle(indication)
+}</span>
+
+func (gt *guildsTree) createGuildNode(n *tview.TreeNode, guild discord.Guild) <span class="cov0" title="0">{
+        guildNode := tview.NewTreeNode(guild.Name).
+                SetReference(guild.ID).
+                SetTextStyle(gt.getGuildNodeStyle(guild.ID))
+        n.AddChild(guildNode)
+}</span>
+
+func (gt *guildsTree) createChannelNode(node *tview.TreeNode, channel discord.Channel) <span class="cov0" title="0">{
+        if channel.Type != discord.DirectMessage &amp;&amp; channel.Type != discord.GroupDM &amp;&amp; !discordState.HasPermissions(channel.ID, discord.PermissionViewChannel) </span><span class="cov0" title="0">{
+                return
+        }</span>
+
+        <span class="cov0" title="0">channelNode := tview.NewTreeNode(ui.ChannelToString(channel)).
+                SetReference(channel.ID).
+                SetTextStyle(gt.getChannelNodeStyle(channel.ID))
+        node.AddChild(channelNode)</span>
+}
+
+func (gt *guildsTree) createChannelNodes(node *tview.TreeNode, channels []discord.Channel) <span class="cov0" title="0">{
+        for _, channel := range channels </span><span class="cov0" title="0">{
+                if channel.Type != discord.GuildCategory &amp;&amp; !channel.ParentID.IsValid() </span><span class="cov0" title="0">{
+                        gt.createChannelNode(node, channel)
+                }</span>
+        }
+
+<span class="cov0" title="0">PARENT_CHANNELS:
+        for _, channel := range channels </span><span class="cov0" title="0">{
+                if channel.Type == discord.GuildCategory </span><span class="cov0" title="0">{
+                        for _, nested := range channels </span><span class="cov0" title="0">{
+                                if nested.ParentID == channel.ID </span><span class="cov0" title="0">{
+                                        gt.createChannelNode(node, channel)
+                                        continue PARENT_CHANNELS</span>
+                                }
+                        }
+                }
+        }
+
+        <span class="cov0" title="0">for _, channel := range channels </span><span class="cov0" title="0">{
+                if channel.ParentID.IsValid() </span><span class="cov0" title="0">{
+                        var parent *tview.TreeNode
+                        node.Walk(func(node, _ *tview.TreeNode) bool </span><span class="cov0" title="0">{
+                                if node.GetReference() == channel.ParentID </span><span class="cov0" title="0">{
+                                        parent = node
+                                        return false
+                                }</span>
+
+                                <span class="cov0" title="0">return true</span>
+                        })
+
+                        <span class="cov0" title="0">if parent != nil </span><span class="cov0" title="0">{
+                                gt.createChannelNode(parent, channel)
+                        }</span>
+                }
+        }
+}
+
+func (gt *guildsTree) onSelected(node *tview.TreeNode) <span class="cov0" title="0">{
+        app.messageInput.reset()
+
+        if len(node.GetChildren()) != 0 </span><span class="cov0" title="0">{
+                node.SetExpanded(!node.IsExpanded())
+                return
+        }</span>
+
+        <span class="cov0" title="0">switch ref := node.GetReference().(type) </span>{
+        case discord.GuildID:<span class="cov0" title="0">
+                go discordState.MemberState.Subscribe(ref)
+
+                channels, err := discordState.Cabinet.Channels(ref)
+                if err != nil </span><span class="cov0" title="0">{
+                        slog.Error("failed to get channels", "err", err, "guild_id", ref)
+                        return
+                }</span>
+
+                <span class="cov0" title="0">sort.Slice(channels, func(i, j int) bool </span><span class="cov0" title="0">{
+                        return channels[i].Position &lt; channels[j].Position
+                }</span>)
+
+                <span class="cov0" title="0">gt.createChannelNodes(node, channels)</span>
+        case discord.ChannelID:<span class="cov0" title="0">
+                channel, err := discordState.Cabinet.Channel(ref)
+                if err != nil </span><span class="cov0" title="0">{
+                        slog.Error("failed to get channel", "channel_id", ref)
+                        return
+                }</span>
+
+                <span class="cov0" title="0">go discordState.ReadState.MarkRead(channel.ID, channel.LastMessageID)
+
+                messages, err := discordState.Messages(channel.ID, uint(gt.cfg.MessagesLimit))
+                if err != nil </span><span class="cov0" title="0">{
+                        slog.Error("failed to get messages", "err", err, "channel_id", channel.ID, "limit", gt.cfg.MessagesLimit)
+                        return
+                }</span>
+
+                <span class="cov0" title="0">if guildID := channel.GuildID; guildID.IsValid() </span><span class="cov0" title="0">{
+                        app.messagesList.requestGuildMembers(guildID, messages)
+                }</span>
+
+                <span class="cov0" title="0">app.messagesList.reset()
+                app.messagesList.setTitle(*channel)
+                app.messagesList.drawMessages(messages)
+                app.messagesList.ScrollToEnd()
+
+                hasPerm := channel.Type != discord.DirectMessage &amp;&amp; channel.Type != discord.GroupDM &amp;&amp; !discordState.HasPermissions(channel.ID, discord.PermissionSendMessages)
+                app.messageInput.SetDisabled(hasPerm)
+
+                gt.selectedChannelID = channel.ID
+                gt.selectedGuildID = channel.GuildID
+                app.SetFocus(app.messageInput)</span>
+        case nil:<span class="cov0" title="0"> // Direct messages
+                channels, err := discordState.PrivateChannels()
+                if err != nil </span><span class="cov0" title="0">{
+                        slog.Error("failed to get private channels", "err", err)
+                        return
+                }</span>
+
+                <span class="cov0" title="0">sort.Slice(channels, func(a, b int) bool </span><span class="cov0" title="0">{
+                        msgID := func(ch discord.Channel) discord.MessageID </span><span class="cov0" title="0">{
+                                if ch.LastMessageID.IsValid() </span><span class="cov0" title="0">{
+                                        return ch.LastMessageID
+                                }</span>
+                                <span class="cov0" title="0">return discord.MessageID(ch.ID)</span>
+                        }
+                        <span class="cov0" title="0">return msgID(channels[a]) &gt; msgID(channels[b])</span>
+                })
+
+                <span class="cov0" title="0">for _, c := range channels </span><span class="cov0" title="0">{
+                        gt.createChannelNode(node, c)
+                }</span>
+        }
+}
+
+func (gt *guildsTree) collapseParentNode(node *tview.TreeNode) <span class="cov0" title="0">{
+        gt.
+                GetRoot().
+                Walk(func(n, parent *tview.TreeNode) bool </span><span class="cov0" title="0">{
+                        if n == node &amp;&amp; parent.GetLevel() != 0 </span><span class="cov0" title="0">{
+                                parent.Collapse()
+                                gt.SetCurrentNode(parent)
+                                return false
+                        }</span>
+
+                        <span class="cov0" title="0">return true</span>
+                })
+}
+
+func (gt *guildsTree) onInputCapture(event *tcell.EventKey) *tcell.EventKey <span class="cov0" title="0">{
+        switch event.Name() </span>{
+        case gt.cfg.Keys.GuildsTree.CollapseParentNode:<span class="cov0" title="0">
+                gt.collapseParentNode(gt.GetCurrentNode())
+                return nil</span>
+        case gt.cfg.Keys.GuildsTree.MoveToParentNode:<span class="cov0" title="0">
+                return tcell.NewEventKey(tcell.KeyRune, 'K', tcell.ModNone)</span>
+
+        case gt.cfg.Keys.GuildsTree.SelectPrevious:<span class="cov0" title="0">
+                return tcell.NewEventKey(tcell.KeyUp, 0, tcell.ModNone)</span>
+        case gt.cfg.Keys.GuildsTree.SelectNext:<span class="cov0" title="0">
+                return tcell.NewEventKey(tcell.KeyDown, 0, tcell.ModNone)</span>
+        case gt.cfg.Keys.GuildsTree.SelectFirst:<span class="cov0" title="0">
+                gt.Move(gt.GetRowCount() * -1)</span>
+                // return tcell.NewEventKey(tcell.KeyHome, 0, tcell.ModNone)
+        case gt.cfg.Keys.GuildsTree.SelectLast:<span class="cov0" title="0">
+                gt.Move(gt.GetRowCount())</span>
+                // return tcell.NewEventKey(tcell.KeyEnd, 0, tcell.ModNone)
+
+        case gt.cfg.Keys.GuildsTree.SelectCurrent:<span class="cov0" title="0">
+                return tcell.NewEventKey(tcell.KeyEnter, 0, tcell.ModNone)</span>
+
+        case gt.cfg.Keys.GuildsTree.YankID:<span class="cov0" title="0">
+                gt.yankID()</span>
+        }
+
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (gt *guildsTree) yankID() <span class="cov0" title="0">{
+        node := gt.GetCurrentNode()
+        if node == nil </span><span class="cov0" title="0">{
+                return
+        }</span>
+
+        // Reference of a tree node in the guilds tree is its ID.
+        // discord.Snowflake (discord.GuildID and discord.ChannelID) have the String method.
+        <span class="cov0" title="0">if id, ok := node.GetReference().(fmt.Stringer); ok </span><span class="cov0" title="0">{
+                go clipboard.Write(clipboard.FmtText, []byte(id.String()))
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package cmd
+
+import (
+        "bytes"
+        "fmt"
+        "io"
+        "log/slog"
+        "os"
+        "os/exec"
+        "path/filepath"
+        "regexp"
+        "slices"
+        "strings"
+        "time"
+        "unicode"
+
+        "github.com/ayn2op/discordo/internal/cache"
+        "github.com/ayn2op/discordo/internal/config"
+        "github.com/ayn2op/discordo/internal/consts"
+        "github.com/ayn2op/discordo/internal/ui"
+        "github.com/ayn2op/tview"
+        "github.com/diamondburned/arikawa/v3/api"
+        "github.com/diamondburned/arikawa/v3/discord"
+        "github.com/diamondburned/arikawa/v3/state"
+        "github.com/diamondburned/arikawa/v3/utils/sendpart"
+        "github.com/diamondburned/ningen/v3/discordmd"
+        "github.com/gdamore/tcell/v2"
+        "github.com/ncruces/zenity"
+        "github.com/sahilm/fuzzy"
+        "github.com/yuin/goldmark/ast"
+        "golang.design/x/clipboard"
+)
+
+const tmpFilePattern = consts.Name + "_*.md"
+
+var mentionRegex = regexp.MustCompile("@[a-zA-Z0-9._]+")
+
+type messageInput struct {
+        *tview.TextArea
+        cfg *config.Config
+
+        sendMessageData *api.SendMessageData
+        cache           *cache.Cache
+        mentionsList    *tview.List
+        lastSearch      time.Time
+}
+
+type memberList []discord.Member
+
+func newMessageInput(cfg *config.Config) *messageInput <span class="cov0" title="0">{
+        mi := &amp;messageInput{
+                TextArea: tview.NewTextArea(),
+                cfg:      cfg,
+
+                sendMessageData: &amp;api.SendMessageData{},
+                cache:           cache.NewCache(),
+                mentionsList:    tview.NewList(),
+        }
+
+        if err := clipboard.Init(); err != nil </span><span class="cov0" title="0">{
+                slog.Warn("failed to init clipboard", "err", err)
+        }</span> else<span class="cov0" title="0"> {
+                mi.
+                        SetClipboard(func(s string) </span><span class="cov0" title="0">{
+                                clipboard.Write(clipboard.FmtText, []byte(s))
+                        }</span>, func() string <span class="cov0" title="0">{
+                                data := clipboard.Read(clipboard.FmtText)
+                                return string(data)
+                        }</span>)
+        }
+
+        <span class="cov0" title="0">mi.Box = ui.ConfigureBox(mi.Box, &amp;cfg.Theme)
+        mi.SetInputCapture(mi.onInputCapture)
+
+        mi.mentionsList.Box = ui.ConfigureBox(mi.mentionsList.Box, &amp;mi.cfg.Theme)
+        mi.mentionsList.
+                ShowSecondaryText(false).
+                SetSelectedStyle(tcell.StyleDefault.Background(tcell.ColorWhite).Foreground(tcell.ColorBlack)).
+                SetTitle("Mentions").
+                SetRect(0, 0, 0, 0)
+
+        b := mi.mentionsList.GetBorderSet()
+        b.BottomLeft, b.BottomRight = b.BottomT, b.BottomT
+        mi.mentionsList.SetBorderSet(b)
+
+        return mi</span>
+}
+
+func (mi *messageInput) reset() <span class="cov0" title="0">{
+        mi.sendMessageData = &amp;api.SendMessageData{}
+        mi.SetTitle("")
+        mi.SetText("", true)
+}</span>
+
+func (mi *messageInput) onInputCapture(event *tcell.EventKey) *tcell.EventKey <span class="cov0" title="0">{
+        switch event.Name() </span>{
+        case mi.cfg.Keys.MessageInput.Paste:<span class="cov0" title="0">
+                mi.paste()
+                return tcell.NewEventKey(tcell.KeyCtrlV, 0, tcell.ModNone)</span>
+
+        case mi.cfg.Keys.MessageInput.Send:<span class="cov0" title="0">
+                if app.pages.GetVisibile(mentionsListPageName) </span><span class="cov0" title="0">{
+                        mi.tabComplete(false)
+                        return nil
+                }</span>
+
+                <span class="cov0" title="0">mi.send()
+                return nil</span>
+        case mi.cfg.Keys.MessageInput.OpenEditor:<span class="cov0" title="0">
+                mi.stopTabCompletion()
+                mi.editor()
+                return nil</span>
+        case mi.cfg.Keys.MessageInput.OpenFilePicker:<span class="cov0" title="0">
+                mi.stopTabCompletion()
+                mi.openFilePicker()
+                return nil</span>
+        case mi.cfg.Keys.MessageInput.Cancel:<span class="cov0" title="0">
+                if app.pages.GetVisibile(mentionsListPageName) </span><span class="cov0" title="0">{
+                        mi.stopTabCompletion()
+                }</span> else<span class="cov0" title="0"> {
+                        mi.reset()
+                }</span>
+
+                <span class="cov0" title="0">return nil</span>
+        case mi.cfg.Keys.MessageInput.TabComplete:<span class="cov0" title="0">
+                go app.QueueUpdateDraw(func() </span><span class="cov0" title="0">{ mi.tabComplete(false) }</span>)
+                <span class="cov0" title="0">return nil</span>
+        }
+
+        <span class="cov0" title="0">if mi.cfg.AutocompleteLimit &gt; 0 </span><span class="cov0" title="0">{
+                if app.pages.GetVisibile(mentionsListPageName) </span><span class="cov0" title="0">{
+                        switch event.Name() </span>{
+                        case mi.cfg.Keys.MentionsList.Up:<span class="cov0" title="0">
+                                mi.mentionsList.InputHandler()(tcell.NewEventKey(tcell.KeyUp, 0, tcell.ModNone), nil)
+                                return nil</span>
+                        case mi.cfg.Keys.MentionsList.Down:<span class="cov0" title="0">
+                                mi.mentionsList.InputHandler()(tcell.NewEventKey(tcell.KeyDown, 0, tcell.ModNone), nil)
+                                return nil</span>
+                        }
+                }
+
+                <span class="cov0" title="0">go app.QueueUpdateDraw(func() </span><span class="cov0" title="0">{ mi.tabComplete(true) }</span>)
+        }
+
+        <span class="cov0" title="0">return event</span>
+}
+
+func (mi *messageInput) paste() <span class="cov0" title="0">{
+        if data := clipboard.Read(clipboard.FmtImage); data != nil </span><span class="cov0" title="0">{
+                name := "clipboard.png"
+                mi.attach(name, sendpart.File{Name: name, Reader: bytes.NewReader(data)})
+        }</span>
+}
+
+func (mi *messageInput) send() <span class="cov0" title="0">{
+        if !app.guildsTree.selectedChannelID.IsValid() </span><span class="cov0" title="0">{
+                return
+        }</span>
+
+        <span class="cov0" title="0">data := mi.sendMessageData
+        if text := strings.TrimSpace(mi.GetText()); text != "" </span><span class="cov0" title="0">{
+                data.Content = processText(app.guildsTree.selectedChannelID, []byte(text))
+        }</span>
+
+        <span class="cov0" title="0">if _, err := discordState.SendMessageComplex(app.guildsTree.selectedChannelID, *data); err != nil </span><span class="cov0" title="0">{
+                slog.Error("failed to send message in channel", "channel_id", app.guildsTree.selectedChannelID, "err", err)
+        }</span>
+
+        // Close the attached files after sending the message.
+        <span class="cov0" title="0">for _, file := range mi.sendMessageData.Files </span><span class="cov0" title="0">{
+                if closer, ok := file.Reader.(io.Closer); ok </span><span class="cov0" title="0">{
+                        closer.Close()
+                }</span>
+        }
+
+        <span class="cov0" title="0">mi.reset()
+        app.messagesList.Highlight()
+        app.messagesList.ScrollToEnd()</span>
+}
+
+func processText(cID discord.ChannelID, src []byte) string <span class="cov0" title="0">{
+        var (
+                ranges     [][2]int
+                canMention = true
+        )
+
+        ast.Walk(discordmd.Parse(src), func(node ast.Node, enter bool) (ast.WalkStatus, error) </span><span class="cov0" title="0">{
+                switch node := node.(type) </span>{
+                case *ast.CodeBlock:<span class="cov0" title="0">
+                        canMention = !enter</span>
+                case *discordmd.Inline:<span class="cov0" title="0">
+                        if (node.Attr &amp; discordmd.AttrMonospace) != 0 </span><span class="cov0" title="0">{
+                                canMention = !enter
+                        }</span>
+                case *ast.Text:<span class="cov0" title="0">
+                        if canMention </span><span class="cov0" title="0">{
+                                ranges = append(ranges, [2]int{node.Segment.Start,
+                                        node.Segment.Stop})
+                        }</span>
+                }
+                <span class="cov0" title="0">return ast.WalkContinue, nil</span>
+        })
+
+        <span class="cov0" title="0">for _, rng := range ranges </span><span class="cov0" title="0">{
+                src = slices.Replace(src, rng[0], rng[1], expandMentions(cID, src[rng[0]:rng[1]])...)
+        }</span>
+
+        <span class="cov0" title="0">return string(src)</span>
+}
+
+func expandMentions(cID discord.ChannelID, src []byte) []byte <span class="cov0" title="0">{
+        return mentionRegex.ReplaceAllFunc(src, func(input []byte) []byte </span><span class="cov0" title="0">{
+                output := input
+                name := strings.ToLower(string(input[1:]))
+                discordState.MemberStore.Each(app.guildsTree.selectedGuildID, func(m *discord.Member) bool </span><span class="cov0" title="0">{
+                        if strings.ToLower(m.User.Username) == name &amp;&amp; channelHasUser(cID, m.User.ID) </span><span class="cov0" title="0">{
+                                output = []byte(m.User.ID.Mention())
+                                return true
+                        }</span>
+
+                        <span class="cov0" title="0">return false</span>
+                })
+
+                <span class="cov0" title="0">return output</span>
+        })
+}
+
+func (mi *messageInput) tabComplete(isAuto bool) <span class="cov0" title="0">{
+        posEnd, name, r := mi.GetWordUnderCursor(func(r rune) bool </span><span class="cov0" title="0">{
+                return unicode.IsLetter(r) || unicode.IsDigit(r) || r == '_' || r == '.'
+        }</span>)
+        <span class="cov0" title="0">if r != '@' </span><span class="cov0" title="0">{
+                mi.stopTabCompletion()
+                return
+        }</span>
+        <span class="cov0" title="0">pos := posEnd - (len(name) + 1)
+
+        gID := app.guildsTree.selectedGuildID
+        cID := app.guildsTree.selectedChannelID
+
+        if !isAuto </span><span class="cov0" title="0">{
+                if mi.cfg.AutocompleteLimit == 0 </span><span class="cov0" title="0">{
+                        mi.searchMember(gID, name)
+
+                        members, err := discordState.Cabinet.Members(gID)
+                        if err != nil </span><span class="cov0" title="0">{
+                                slog.Error("failed to get members from state", "guild_id", gID, "err", err)
+                                return
+                        }</span>
+
+                        <span class="cov0" title="0">res := fuzzy.FindFrom(name, memberList(members))
+                        for _, r := range res </span><span class="cov0" title="0">{
+                                if channelHasUser(cID, members[r.Index].User.ID) </span><span class="cov0" title="0">{
+                                        mi.Replace(pos, posEnd, "@"+members[r.Index].User.Username+" ")
+                                        return
+                                }</span>
+                        }
+                        <span class="cov0" title="0">return</span>
+                }
+                <span class="cov0" title="0">if mi.mentionsList.GetItemCount() == 0 </span><span class="cov0" title="0">{
+                        return
+                }</span>
+                <span class="cov0" title="0">_, name = mi.mentionsList.GetItemText(mi.mentionsList.GetCurrentItem())
+                mi.Replace(pos, posEnd, "@"+name+" ")
+                mi.stopTabCompletion()
+                return</span>
+        }
+
+        // Special case, show recent messages' authors
+        <span class="cov0" title="0">if name == "" </span><span class="cov0" title="0">{
+                msgs, err := discordState.Cabinet.Messages(cID)
+                if err != nil </span><span class="cov0" title="0">{
+                        return
+                }</span>
+                <span class="cov0" title="0">shown := make(map[string]bool)
+                mi.mentionsList.Clear()
+                for _, m := range msgs </span><span class="cov0" title="0">{
+                        if shown[m.Author.Username] </span><span class="cov0" title="0">{
+                                continue</span>
+                        }
+                        <span class="cov0" title="0">shown[m.Author.Username] = true
+                        discordState.MemberState.RequestMember(gID, m.Author.ID)
+                        if mem, err := discordState.Cabinet.Member(gID, m.Author.ID); err == nil </span><span class="cov0" title="0">{
+                                if mi.addMentionItem(gID, mem) </span><span class="cov0" title="0">{
+                                        break</span>
+                                }
+                        }
+                }
+        } else<span class="cov0" title="0"> {
+                mi.searchMember(gID, name)
+                mi.mentionsList.Clear()
+                mems, err := discordState.Cabinet.Members(gID)
+                if err != nil </span><span class="cov0" title="0">{
+                        slog.Error("fetching members failed", "err", err)
+                        return
+                }</span>
+                <span class="cov0" title="0">res := fuzzy.FindFrom(name, memberList(mems))
+                if len(res) &gt; int(mi.cfg.AutocompleteLimit) </span><span class="cov0" title="0">{
+                        res = res[:int(mi.cfg.AutocompleteLimit)]
+                }</span>
+                <span class="cov0" title="0">for _, r := range res </span><span class="cov0" title="0">{
+                        if channelHasUser(cID, mems[r.Index].User.ID) &amp;&amp;
+                                mi.addMentionItem(gID, &amp;mems[r.Index]) </span><span class="cov0" title="0">{
+                                break</span>
+                        }
+                }
+        }
+
+        <span class="cov0" title="0">if mi.mentionsList.GetItemCount() == 0 </span><span class="cov0" title="0">{
+                mi.stopTabCompletion()
+                return
+        }</span>
+
+        <span class="cov0" title="0">_, col, _, _ := mi.GetCursor()
+        mi.showMentionList(col - 1)</span>
+}
+
+func (m memberList) String(i int) string <span class="cov0" title="0">{ return m[i].Nick + m[i].User.DisplayName + m[i].User.Tag() }</span>
+func (m memberList) Len() int            <span class="cov0" title="0">{ return len(m) }</span>
+
+func channelHasUser(cID discord.ChannelID, id discord.UserID) bool <span class="cov0" title="0">{
+        perms, err := discordState.Permissions(cID, id)
+        if err != nil </span><span class="cov0" title="0">{
+                slog.Error("can't get permissions", "channel", cID, "user", id)
+                return false
+        }</span>
+        <span class="cov0" title="0">return perms.Has(discord.PermissionViewChannel)</span>
+}
+
+func (mi *messageInput) searchMember(gID discord.GuildID, name string) <span class="cov0" title="0">{
+        key := gID.String() + " " + name
+        if mi.cache.Exists(key) </span><span class="cov0" title="0">{
+                return
+        }</span>
+        // If searching for "ab" returns less than SearchLimit,
+        // then "abc" would not return anything new because we already searched
+        // everything starting with "ab". This will still be true even if a new
+        // member joins because arikawa loads new members into the state.
+        <span class="cov0" title="0">if k := key[:len(key)-1]; mi.cache.Exists(k) </span><span class="cov0" title="0">{
+                if c := mi.cache.Get(k); c &lt; discordState.MemberState.SearchLimit </span><span class="cov0" title="0">{
+                        mi.cache.Create(key, c)
+                        return
+                }</span>
+        }
+
+        // Rate limit on our side because we can't distinguish between a successful search and SearchMember not doing anything because of its internal rate limit that we can't detect
+        <span class="cov0" title="0">if mi.lastSearch.Add(discordState.MemberState.SearchFrequency).After(time.Now()) </span><span class="cov0" title="0">{
+                return
+        }</span>
+
+        <span class="cov0" title="0">mi.lastSearch = time.Now()
+        app.messagesList.waitForChunkEvent()
+        app.messagesList.setFetchingChunk(true, 0)
+        discordState.MemberState.SearchMember(gID, name)
+        mi.cache.Create(key, app.messagesList.waitForChunkEvent())</span>
+}
+
+func (mi *messageInput) showMentionList(col int) <span class="cov0" title="0">{
+        borders := 0
+        if mi.cfg.Theme.Border.Enabled </span><span class="cov0" title="0">{
+                borders = 1
+        }</span>
+        <span class="cov0" title="0">l := mi.mentionsList
+        x, _, _, _ := mi.GetInnerRect()
+        _, y, _, _ := mi.GetRect()
+        _, _, maxW, maxH := app.messagesList.GetInnerRect()
+        if t := int(mi.cfg.Theme.MentionsList.MaxHeight); t != 0 </span><span class="cov0" title="0">{
+                maxH = min(maxH, t)
+        }</span>
+        <span class="cov0" title="0">count := l.GetItemCount() + borders
+        h := min(count, maxH) + borders + mi.cfg.Theme.Border.Padding[1]
+        y -= h
+        w := int(mi.cfg.Theme.MentionsList.MinWidth)
+        if w == 0 </span><span class="cov0" title="0">{
+                w = maxW
+        }</span> else<span class="cov0" title="0"> {
+                for i := range count - 1 </span><span class="cov0" title="0">{
+                        t, _ := mi.mentionsList.GetItemText(i)
+                        w = max(w, tview.TaggedStringWidth(t))
+                }</span>
+
+                <span class="cov0" title="0">w = min(w+borders*2, maxW)
+                x += min(col, maxW-w)</span>
+        }
+
+        <span class="cov0" title="0">l.SetRect(x, y, w, h)
+
+        app.pages.
+                AddAndSwitchToPage(mentionsListPageName, l, false).
+                ShowPage(flexPageName)
+        app.SetFocus(mi)</span>
+}
+
+func (mi *messageInput) addMentionItem(gID discord.GuildID, m *discord.Member) bool <span class="cov0" title="0">{
+        if m == nil </span><span class="cov0" title="0">{
+                return false
+        }</span>
+
+        <span class="cov0" title="0">name := m.User.DisplayOrUsername()
+        if m.Nick != "" </span><span class="cov0" title="0">{
+                name = m.Nick
+        }</span>
+
+        // this is WAY faster than discordState.MemberColor
+        <span class="cov0" title="0">color, ok := state.MemberColor(m, func(id discord.RoleID) *discord.Role </span><span class="cov0" title="0">{
+                r, _ := discordState.Cabinet.Role(gID, id)
+                return r
+        }</span>)
+        <span class="cov0" title="0">if ok </span><span class="cov0" title="0">{
+                name = fmt.Sprintf("[%s]%s[-]", color, name)
+        }</span>
+
+        <span class="cov0" title="0">presence, err := discordState.Cabinet.Presence(gID, m.User.ID)
+        if err != nil </span><span class="cov0" title="0">{
+                slog.Info("failed to get presence from state", "guild_id", gID, "user_id", m.User.ID, "err", err)
+        }</span>
+
+        <span class="cov0" title="0">if presence != nil &amp;&amp; presence.Status == discord.OfflineStatus </span><span class="cov0" title="0">{
+                name = fmt.Sprintf("[::d]%s[::D]", name)
+        }</span>
+
+        <span class="cov0" title="0">mi.mentionsList.AddItem(name, m.User.Username, 0, nil)
+        return mi.mentionsList.GetItemCount() &gt; int(mi.cfg.AutocompleteLimit)</span>
+}
+
+func (mi *messageInput) removeMentionsList() <span class="cov0" title="0">{
+        app.pages.
+                RemovePage(mentionsListPageName).
+                SwitchToPage(flexPageName)
+}</span>
+
+func (mi *messageInput) stopTabCompletion() <span class="cov0" title="0">{
+        if mi.cfg.AutocompleteLimit &gt; 0 </span><span class="cov0" title="0">{
+                mi.mentionsList.Clear()
+                mi.removeMentionsList()
+                app.SetFocus(mi)
+        }</span>
+}
+
+func (mi *messageInput) editor() <span class="cov0" title="0">{
+        file, err := os.CreateTemp("", tmpFilePattern)
+        if err != nil </span><span class="cov0" title="0">{
+                slog.Error("failed to create tmp file", "err", err)
+                return
+        }</span>
+        <span class="cov0" title="0">defer file.Close()
+        defer os.Remove(file.Name())
+
+        file.WriteString(mi.GetText())
+
+        cmd := exec.Command(mi.cfg.Editor, file.Name())
+        cmd.Stdin = os.Stdin
+        cmd.Stdout = os.Stdout
+        cmd.Stderr = os.Stderr
+
+        app.Suspend(func() </span><span class="cov0" title="0">{
+                err := cmd.Run()
+                if err != nil </span><span class="cov0" title="0">{
+                        slog.Error("failed to run command", "args", cmd.Args, "err", err)
+                        return
+                }</span>
+        })
+
+        <span class="cov0" title="0">msg, err := os.ReadFile(file.Name())
+        if err != nil </span><span class="cov0" title="0">{
+                slog.Error("failed to read tmp file", "name", file.Name(), "err", err)
+                return
+        }</span>
+
+        <span class="cov0" title="0">mi.SetText(strings.TrimSpace(string(msg)), true)</span>
+}
+
+func (mi *messageInput) addTitle(s string) <span class="cov0" title="0">{
+        title := mi.GetTitle()
+        if title != "" </span><span class="cov0" title="0">{
+                title += " | "
+        }</span>
+
+        <span class="cov0" title="0">mi.SetTitle(title + s)</span>
+}
+
+func (mi *messageInput) openFilePicker() <span class="cov0" title="0">{
+        if !app.guildsTree.selectedChannelID.IsValid() </span><span class="cov0" title="0">{
+                return
+        }</span>
+
+        <span class="cov0" title="0">paths, err := zenity.SelectFileMultiple()
+        if err != nil </span><span class="cov0" title="0">{
+                slog.Error("failed to open file dialog", "err", err)
+                return
+        }</span>
+
+        <span class="cov0" title="0">for _, path := range paths </span><span class="cov0" title="0">{
+                file, err := os.Open(path)
+                if err != nil </span><span class="cov0" title="0">{
+                        slog.Error("failed to open file", "path", path, "err", err)
+                        continue</span>
+                }
+
+                <span class="cov0" title="0">name := filepath.Base(path)
+                mi.attach(name, sendpart.File{Name: name, Reader: file})</span>
+        }
+}
+
+func (mi *messageInput) attach(name string, file sendpart.File) <span class="cov0" title="0">{
+        mi.sendMessageData.Files = append(mi.sendMessageData.Files, file)
+        mi.addTitle("Attached " + name)
+}</span>
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package cmd
+
+import (
+        "context"
+        "errors"
+        "fmt"
+        "io"
+        "log/slog"
+        "net/http"
+        "os"
+        "path/filepath"
+        "slices"
+        "strings"
+        "sync"
+        "time"
+
+        "github.com/ayn2op/discordo/internal/config"
+        "github.com/ayn2op/discordo/internal/consts"
+        "github.com/ayn2op/discordo/internal/markdown"
+        "github.com/ayn2op/discordo/internal/ui"
+        "github.com/ayn2op/tview"
+        "github.com/diamondburned/arikawa/v3/api"
+        "github.com/diamondburned/arikawa/v3/discord"
+        "github.com/diamondburned/arikawa/v3/gateway"
+        "github.com/diamondburned/arikawa/v3/state"
+        "github.com/diamondburned/arikawa/v3/utils/json/option"
+        "github.com/diamondburned/ningen/v3/discordmd"
+        "github.com/gdamore/tcell/v2"
+        "github.com/skratchdot/open-golang/open"
+        "github.com/yuin/goldmark/ast"
+        "github.com/yuin/goldmark/parser"
+        "github.com/yuin/goldmark/renderer"
+        "github.com/yuin/goldmark/text"
+        "golang.design/x/clipboard"
+)
+
+type messagesList struct {
+        *tview.TextView
+        cfg               *config.Config
+        selectedMessageID discord.MessageID
+
+        fetchingMembers struct {
+                mu    sync.Mutex
+                value bool
+                count uint
+                done  chan struct{}
+        }
+}
+
+func newMessagesList(cfg *config.Config) *messagesList <span class="cov8" title="1">{
+        ml := &amp;messagesList{
+                TextView: tview.NewTextView(),
+                cfg:      cfg,
+        }
+
+        ml.Box = ui.ConfigureBox(ml.Box, &amp;cfg.Theme)
+        ml.
+                SetDynamicColors(true).
+                SetRegions(true).
+                SetWordWrap(true).
+                ScrollToEnd().
+                SetHighlightedFunc(ml.onHighlighted).
+                SetTitle("Messages").
+                SetInputCapture(ml.onInputCapture)
+
+        markdown.DefaultRenderer.AddOptions(renderer.WithOption("theme", cfg.Theme))
+        return ml
+}</span>
+
+func (ml *messagesList) reset() <span class="cov8" title="1">{
+        ml.selectedMessageID = 0
+        ml.
+                Clear().
+                Highlight().
+                SetTitle("")
+}</span>
+
+func (ml *messagesList) setTitle(channel discord.Channel) <span class="cov8" title="1">{
+        title := ui.ChannelToString(channel)
+        if topic := channel.Topic; topic != "" </span><span class="cov8" title="1">{
+                title += " - " + topic
+        }</span>
+
+        <span class="cov8" title="1">app.messagesList.SetTitle(title)</span>
+}
+
+func (ml *messagesList) drawMessages(messages []discord.Message) <span class="cov0" title="0">{
+        for _, m := range slices.Backward(messages) </span><span class="cov0" title="0">{
+                ml.drawMessage(m)
+        }</span>
+}
+
+func (ml *messagesList) drawMessage(message discord.Message) <span class="cov0" title="0">{
+        // Region tags are square brackets that contain a region ID in double quotes
+        // https://pkg.go.dev/github.com/ayn2op/tview#hdr-Regions_and_Highlights
+        fmt.Fprintf(ml, `["%s"]`, message.ID)
+        // Tags with no region ID ([""]) don't start new regions. They can therefore be used to mark the end of a region.
+        defer fmt.Fprint(ml, `[""]`)
+
+        if ml.cfg.HideBlockedUsers </span><span class="cov0" title="0">{
+                isBlocked := discordState.UserIsBlocked(message.Author.ID)
+                if isBlocked </span><span class="cov0" title="0">{
+                        io.WriteString(ml, "[:red:b]Blocked message[:-:-]")
+                        return
+                }</span>
+        }
+
+        // reset
+        <span class="cov0" title="0">io.WriteString(ml, "[-:-:-]")
+
+        switch message.Type </span>{
+        case discord.DefaultMessage:<span class="cov0" title="0">
+                if message.Reference != nil &amp;&amp; message.Reference.Type == discord.MessageReferenceTypeForward </span><span class="cov0" title="0">{
+                        ml.drawForwardedMessage(message)
+                }</span> else<span class="cov0" title="0"> {
+                        ml.drawDefaultMessage(message)
+                }</span>
+        case discord.GuildMemberJoinMessage:<span class="cov0" title="0">
+                ml.drawTimestamps(message.Timestamp)
+                ml.drawAuthor(message)
+                fmt.Fprint(ml, "joined the server.")</span>
+        case discord.InlinedReplyMessage:<span class="cov0" title="0">
+                ml.drawReplyMessage(message)</span>
+        case discord.ChannelPinnedMessage:<span class="cov0" title="0">
+                ml.drawPinnedMessage(message)</span>
+        default:<span class="cov0" title="0">
+                ml.drawTimestamps(message.Timestamp)
+                ml.drawAuthor(message)</span>
+        }
+
+        <span class="cov0" title="0">fmt.Fprintln(ml)</span>
+}
+
+func (ml *messagesList) formatTimestamp(ts discord.Timestamp) string <span class="cov8" title="1">{
+        return ts.Time().In(time.Local).Format(ml.cfg.Timestamps.Format)
+}</span>
+
+func (ml *messagesList) drawTimestamps(ts discord.Timestamp) <span class="cov8" title="1">{
+        fmt.Fprintf(ml, "[::d]%s[::D] ", ml.formatTimestamp(ts))
+}</span>
+
+func (ml *messagesList) drawAuthor(msg discord.Message) <span class="cov8" title="1">{
+        name := msg.Author.DisplayOrUsername()
+        foreground := tcell.ColorDefault
+        if msg.GuildID.IsValid() </span><span class="cov0" title="0">{
+                member, err := discordState.Cabinet.Member(msg.GuildID, msg.Author.ID)
+                if err != nil </span><span class="cov0" title="0">{
+                        slog.Error("failed to get member from state", "guild_id", msg.GuildID, "member_id", msg.Author.ID, "err", err)
+                }</span> else<span class="cov0" title="0"> {
+                        if member.Nick != "" </span><span class="cov0" title="0">{
+                                name = member.Nick
+                        }</span>
+
+                        <span class="cov0" title="0">color, ok := state.MemberColor(member, func(id discord.RoleID) *discord.Role </span><span class="cov0" title="0">{
+                                r, _ := discordState.Cabinet.Role(msg.GuildID, id)
+                                return r
+                        }</span>)
+                        <span class="cov0" title="0">if ok </span><span class="cov0" title="0">{
+                                foreground = tcell.GetColor(color.String())
+                        }</span>
+                }
+        }
+
+        <span class="cov8" title="1">fmt.Fprintf(ml, "[%s::b]%s[-::B] ", foreground, name)</span>
+}
+
+func (ml *messagesList) drawContent(msg discord.Message) <span class="cov8" title="1">{
+        c := []byte(tview.Escape(msg.Content))
+        if app.cfg.Markdown </span><span class="cov0" title="0">{
+                ast := discordmd.ParseWithMessage(c, *discordState.Cabinet, &amp;msg, false)
+                markdown.DefaultRenderer.Render(ml, c, ast)
+        }</span> else<span class="cov8" title="1"> {
+                ml.Write(c) // write the content as is
+        }</span>
+}
+
+func (ml *messagesList) drawSnapshotContent(message discord.MessageSnapshotMessage) <span class="cov8" title="1">{
+        c := []byte(tview.Escape(message.Content))
+        // discordmd doesn't support MessageSnapshotMessage, so we just use write it as is. todo?
+        ml.Write(c)
+}</span>
+
+func (ml *messagesList) drawDefaultMessage(message discord.Message) <span class="cov8" title="1">{
+        if ml.cfg.Timestamps.Enabled </span><span class="cov0" title="0">{
+                ml.drawTimestamps(message.Timestamp)
+        }</span>
+
+        <span class="cov8" title="1">ml.drawAuthor(message)
+        ml.drawContent(message)
+
+        if message.EditedTimestamp.IsValid() </span><span class="cov0" title="0">{
+                io.WriteString(ml, " [::d](edited)[::D]")
+        }</span>
+
+        <span class="cov8" title="1">for _, a := range message.Attachments </span><span class="cov8" title="1">{
+                fmt.Fprintln(ml)
+
+                fg, bg, _ := ml.cfg.Theme.MessagesList.AttachmentStyle.Decompose()
+                if ml.cfg.ShowAttachmentLinks </span><span class="cov8" title="1">{
+                        fmt.Fprintf(ml, "[%s:%s]%s:\n%s[-:-]", fg, bg, a.Filename, a.URL)
+                }</span> else<span class="cov0" title="0"> {
+                        fmt.Fprintf(ml, "[%s:%s]%s[-:-]", fg, bg, a.Filename)
+                }</span>
+        }
+}
+
+func (ml *messagesList) drawForwardedMessage(message discord.Message) <span class="cov8" title="1">{
+        ml.drawTimestamps(message.Timestamp)
+        ml.drawAuthor(message)
+        fmt.Fprintf(ml, "[::d]%s [::-]", ml.cfg.Theme.MessagesList.ForwardedIndicator)
+        ml.drawSnapshotContent(message.MessageSnapshots[0].Message)
+        fmt.Fprintf(ml, " [::d](%s)[-:-:-] ", ml.formatTimestamp(message.MessageSnapshots[0].Message.Timestamp))
+}</span>
+
+func (ml *messagesList) drawReplyMessage(message discord.Message) <span class="cov0" title="0">{
+        // reply
+        fmt.Fprintf(ml, "[::d]%s ", ml.cfg.Theme.MessagesList.ReplyIndicator)
+        if refMsg := message.ReferencedMessage; refMsg != nil </span><span class="cov0" title="0">{
+                refMsg.GuildID = message.GuildID
+                ml.drawAuthor(*refMsg)
+                ml.drawContent(*refMsg)
+        }</span> else<span class="cov0" title="0"> {
+                io.WriteString(ml, "Original message was deleted")
+        }</span>
+
+        <span class="cov0" title="0">io.WriteString(ml, tview.NewLine)
+        // main
+        ml.drawDefaultMessage(message)</span>
+}
+
+func (ml *messagesList) drawPinnedMessage(message discord.Message) <span class="cov8" title="1">{
+        fmt.Fprintf(ml, "%s pinned a message", message.Author.DisplayOrUsername())
+}</span>
+
+func (ml *messagesList) selectedMsg() (*discord.Message, error) <span class="cov8" title="1">{
+        if !ml.selectedMessageID.IsValid() </span><span class="cov8" title="1">{
+                return nil, errors.New("no message is currently selected")
+        }</span>
+
+        <span class="cov0" title="0">msg, err := discordState.Cabinet.Message(app.guildsTree.selectedChannelID, ml.selectedMessageID)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("could not retrieve selected message: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">return msg, nil</span>
+}
+
+func (ml *messagesList) selectedMsgIndex() (int, error) <span class="cov0" title="0">{
+        ms, err := discordState.Cabinet.Messages(app.guildsTree.selectedChannelID)
+        if err != nil </span><span class="cov0" title="0">{
+                return -1, err
+        }</span>
+
+        <span class="cov0" title="0">for i, m := range ms </span><span class="cov0" title="0">{
+                if m.ID == ml.selectedMessageID </span><span class="cov0" title="0">{
+                        return i, nil
+                }</span>
+        }
+
+        <span class="cov0" title="0">return -1, nil</span>
+}
+
+func (ml *messagesList) onInputCapture(event *tcell.EventKey) *tcell.EventKey <span class="cov0" title="0">{
+        switch event.Name() </span>{
+        case ml.cfg.Keys.MessagesList.Cancel:<span class="cov0" title="0">
+                ml.selectedMessageID = 0
+                ml.Highlight()</span>
+
+        case ml.cfg.Keys.MessagesList.SelectPrevious, ml.cfg.Keys.MessagesList.SelectNext, ml.cfg.Keys.MessagesList.SelectFirst, ml.cfg.Keys.MessagesList.SelectLast, ml.cfg.Keys.MessagesList.SelectReply:<span class="cov0" title="0">
+                ml._select(event.Name())</span>
+        case ml.cfg.Keys.MessagesList.YankID:<span class="cov0" title="0">
+                ml.yankID()</span>
+        case ml.cfg.Keys.MessagesList.YankContent:<span class="cov0" title="0">
+                ml.yankContent()</span>
+        case ml.cfg.Keys.MessagesList.YankURL:<span class="cov0" title="0">
+                ml.yankURL()</span>
+        case ml.cfg.Keys.MessagesList.Open:<span class="cov0" title="0">
+                ml.open()</span>
+        case ml.cfg.Keys.MessagesList.Reply:<span class="cov0" title="0">
+                ml.reply(false)</span>
+        case ml.cfg.Keys.MessagesList.ReplyMention:<span class="cov0" title="0">
+                ml.reply(true)</span>
+        case ml.cfg.Keys.MessagesList.Delete:<span class="cov0" title="0">
+                ml.delete()</span>
+        }
+
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (ml *messagesList) _select(name string) <span class="cov0" title="0">{
+        ms, err := discordState.Cabinet.Messages(app.guildsTree.selectedChannelID)
+        if err != nil </span><span class="cov0" title="0">{
+                slog.Error("failed to get messages", "err", err, "channel_id", app.guildsTree.selectedChannelID)
+                return
+        }</span>
+
+        <span class="cov0" title="0">msgIdx, err := ml.selectedMsgIndex()
+        if err != nil </span><span class="cov0" title="0">{
+                slog.Error("failed to get selected message", "err", err)
+                return
+        }</span>
+
+        <span class="cov0" title="0">switch name </span>{
+        case ml.cfg.Keys.MessagesList.SelectPrevious:<span class="cov0" title="0">
+                // If no message is currently selected, select the latest message.
+                if len(ml.GetHighlights()) == 0 </span><span class="cov0" title="0">{
+                        ml.selectedMessageID = ms[0].ID
+                }</span> else<span class="cov0" title="0"> if msgIdx &lt; len(ms)-1 </span><span class="cov0" title="0">{
+                        ml.selectedMessageID = ms[msgIdx+1].ID
+                }</span> else<span class="cov0" title="0"> {
+                        return
+                }</span>
+        case ml.cfg.Keys.MessagesList.SelectNext:<span class="cov0" title="0">
+                // If no message is currently selected, select the latest message.
+                if len(ml.GetHighlights()) == 0 </span><span class="cov0" title="0">{
+                        ml.selectedMessageID = ms[0].ID
+                }</span> else<span class="cov0" title="0"> if msgIdx &gt; 0 </span><span class="cov0" title="0">{
+                        ml.selectedMessageID = ms[msgIdx-1].ID
+                }</span> else<span class="cov0" title="0"> {
+                        return
+                }</span>
+        case ml.cfg.Keys.MessagesList.SelectFirst:<span class="cov0" title="0">
+                ml.selectedMessageID = ms[len(ms)-1].ID</span>
+        case ml.cfg.Keys.MessagesList.SelectLast:<span class="cov0" title="0">
+                ml.selectedMessageID = ms[0].ID</span>
+        case ml.cfg.Keys.MessagesList.SelectReply:<span class="cov0" title="0">
+                if ml.selectedMessageID == 0 </span><span class="cov0" title="0">{
+                        return
+                }</span>
+
+                <span class="cov0" title="0">if ref := ms[msgIdx].ReferencedMessage; ref != nil </span><span class="cov0" title="0">{
+                        for _, m := range ms </span><span class="cov0" title="0">{
+                                if ref.ID == m.ID </span><span class="cov0" title="0">{
+                                        ml.selectedMessageID = m.ID
+                                }</span>
+                        }
+                }
+        }
+
+        <span class="cov0" title="0">ml.Highlight(ml.selectedMessageID.String())
+        ml.ScrollToHighlight()</span>
+}
+
+func (ml *messagesList) onHighlighted(added, removed, remaining []string) <span class="cov8" title="1">{
+        if len(added) &gt; 0 </span><span class="cov8" title="1">{
+                id, err := discord.ParseSnowflake(added[0])
+                if err != nil </span><span class="cov8" title="1">{
+                        slog.Error("Failed to parse region id as int to use as message id.", "err", err)
+                        return
+                }</span>
+
+                <span class="cov8" title="1">ml.selectedMessageID = discord.MessageID(id)</span>
+        }
+}
+
+func (ml *messagesList) yankID() <span class="cov0" title="0">{
+        msg, err := ml.selectedMsg()
+        if err != nil </span><span class="cov0" title="0">{
+                slog.Error("failed to get selected message", "err", err)
+                return
+        }</span>
+
+        <span class="cov0" title="0">go clipboard.Write(clipboard.FmtText, []byte(msg.ID.String()))</span>
+}
+
+func (ml *messagesList) yankContent() <span class="cov0" title="0">{
+        msg, err := ml.selectedMsg()
+        if err != nil </span><span class="cov0" title="0">{
+                slog.Error("failed to get selected message", "err", err)
+                return
+        }</span>
+
+        <span class="cov0" title="0">go clipboard.Write(clipboard.FmtText, []byte(msg.Content))</span>
+}
+
+func (ml *messagesList) yankURL() <span class="cov0" title="0">{
+        msg, err := ml.selectedMsg()
+        if err != nil </span><span class="cov0" title="0">{
+                slog.Error("failed to get selected message", "err", err)
+                return
+        }</span>
+
+        <span class="cov0" title="0">go clipboard.Write(clipboard.FmtText, []byte(msg.URL()))</span>
+}
+
+func (ml *messagesList) open() <span class="cov0" title="0">{
+        msg, err := ml.selectedMsg()
+        if err != nil </span><span class="cov0" title="0">{
+                slog.Error("failed to get selected message", "err", err)
+                return
+        }</span>
+
+        <span class="cov0" title="0">var urls []string
+        if msg.Content != "" </span><span class="cov0" title="0">{
+                urls = extractURLs(msg.Content)
+        }</span>
+
+        <span class="cov0" title="0">if len(urls) == 0 &amp;&amp; len(msg.Attachments) == 0 </span><span class="cov0" title="0">{
+                return
+        }</span>
+
+        <span class="cov0" title="0">if len(urls)+len(msg.Attachments) == 1 </span><span class="cov0" title="0">{
+                if len(urls) == 1 </span><span class="cov0" title="0">{
+                        go ml.openURL(urls[0])
+                }</span> else<span class="cov0" title="0"> {
+                        attachment := msg.Attachments[0]
+                        if strings.HasPrefix(attachment.ContentType, "image/") </span><span class="cov0" title="0">{
+                                go ml.openAttachment(msg.Attachments[0])
+                        }</span> else<span class="cov0" title="0"> {
+                                go ml.openURL(attachment.URL)
+                        }</span>
+                }
+        } else<span class="cov0" title="0"> {
+                ml.showAttachmentsList(urls, msg.Attachments)
+        }</span>
+}
+
+func extractURLs(content string) []string <span class="cov8" title="1">{
+        src := []byte(content)
+        node := parser.NewParser(
+                parser.WithBlockParsers(discordmd.BlockParsers()...),
+                parser.WithInlineParsers(discordmd.InlineParserWithLink()...),
+        ).Parse(text.NewReader(src))
+
+        var urls []string
+        ast.Walk(node, func(n ast.Node, entering bool) (ast.WalkStatus, error) </span><span class="cov8" title="1">{
+                if entering </span><span class="cov8" title="1">{
+                        switch n := n.(type) </span>{
+                        case *ast.AutoLink:<span class="cov8" title="1">
+                                urls = append(urls, string(n.URL(src)))</span>
+                        case *ast.Link:<span class="cov8" title="1">
+                                urls = append(urls, string(n.Destination))</span>
+                        }
+                }
+
+                <span class="cov8" title="1">return ast.WalkContinue, nil</span>
+        })
+        <span class="cov8" title="1">return urls</span>
+}
+
+func (ml *messagesList) showAttachmentsList(urls []string, attachments []discord.Attachment) <span class="cov0" title="0">{
+        list := tview.NewList().
+                SetWrapAround(true).
+                SetHighlightFullLine(true).
+                ShowSecondaryText(false).
+                SetDoneFunc(func() </span><span class="cov0" title="0">{
+                        app.pages.RemovePage(attachmentsListPageName).SwitchToPage(flexPageName)
+                        app.SetFocus(ml)
+                }</span>)
+        <span class="cov0" title="0">list.
+                SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey </span><span class="cov0" title="0">{
+                        switch event.Name() </span>{
+                        case ml.cfg.Keys.MessagesList.SelectPrevious:<span class="cov0" title="0">
+                                return tcell.NewEventKey(tcell.KeyUp, 0, tcell.ModNone)</span>
+                        case ml.cfg.Keys.MessagesList.SelectNext:<span class="cov0" title="0">
+                                return tcell.NewEventKey(tcell.KeyDown, 0, tcell.ModNone)</span>
+                        case ml.cfg.Keys.MessagesList.SelectFirst:<span class="cov0" title="0">
+                                return tcell.NewEventKey(tcell.KeyHome, 0, tcell.ModNone)</span>
+                        case ml.cfg.Keys.MessagesList.SelectLast:<span class="cov0" title="0">
+                                return tcell.NewEventKey(tcell.KeyEnd, 0, tcell.ModNone)</span>
+                        }
+
+                        <span class="cov0" title="0">return event</span>
+                })
+        <span class="cov0" title="0">list.Box = ui.ConfigureBox(list.Box, &amp;ml.cfg.Theme)
+
+        for i, a := range attachments </span><span class="cov0" title="0">{
+                list.AddItem(a.Filename, "", rune('a'+i), func() </span><span class="cov0" title="0">{
+                        if strings.HasPrefix(a.ContentType, "image/") </span><span class="cov0" title="0">{
+                                go ml.openAttachment(a)
+                        }</span> else<span class="cov0" title="0"> {
+                                go ml.openURL(a.URL)
+                        }</span>
+                })
+        }
+
+        <span class="cov0" title="0">for i, u := range urls </span><span class="cov0" title="0">{
+                list.AddItem(u, "", rune('1'+i), func() </span><span class="cov0" title="0">{
+                        go ml.openURL(u)
+                }</span>)
+        }
+
+        <span class="cov0" title="0">app.pages.
+                AddAndSwitchToPage(attachmentsListPageName, ui.Centered(list, 0, 0), true).
+                ShowPage(flexPageName)</span>
+}
+
+func (ml *messagesList) openAttachment(attachment discord.Attachment) <span class="cov0" title="0">{
+        resp, err := http.Get(attachment.URL)
+        if err != nil </span><span class="cov0" title="0">{
+                slog.Error("failed to fetch the attachment", "err", err, "url", attachment.URL)
+        }</span>
+        <span class="cov0" title="0">defer resp.Body.Close()
+
+        path := filepath.Join(consts.CacheDir(), "attachments")
+        if err := os.MkdirAll(path, os.ModePerm); err != nil </span><span class="cov0" title="0">{
+                slog.Error("failed to create attachments dir", "err", err, "path", path)
+                return
+        }</span>
+
+        <span class="cov0" title="0">path = filepath.Join(path, attachment.Filename)
+        file, err := os.Create(path)
+        if err != nil </span><span class="cov0" title="0">{
+                slog.Error("failed to create attachment file", "err", err, "path", path)
+                return
+        }</span>
+        <span class="cov0" title="0">defer file.Close()
+
+        if _, err := io.Copy(file, resp.Body); err != nil </span><span class="cov0" title="0">{
+                slog.Error("failed to copy attachment to file", "err", err)
+                return
+        }</span>
+
+        <span class="cov0" title="0">if err := open.Start(path); err != nil </span><span class="cov0" title="0">{
+                slog.Error("failed to open attachment file", "err", err, "path", path)
+                return
+        }</span>
+}
+
+func (ml *messagesList) openURL(url string) <span class="cov0" title="0">{
+        if err := open.Start(url); err != nil </span><span class="cov0" title="0">{
+                slog.Error("failed to open URL", "err", err, "url", url)
+        }</span>
+}
+
+func (ml *messagesList) reply(mention bool) <span class="cov0" title="0">{
+        msg, err := ml.selectedMsg()
+        if err != nil </span><span class="cov0" title="0">{
+                slog.Error("failed to get selected message", "err", err)
+                return
+        }</span>
+
+        <span class="cov0" title="0">name := msg.Author.DisplayOrUsername()
+        if msg.GuildID.IsValid() </span><span class="cov0" title="0">{
+                member, err := discordState.Cabinet.Member(msg.GuildID, msg.Author.ID)
+                if err != nil </span><span class="cov0" title="0">{
+                        slog.Error("failed to get member from state", "guild_id", msg.GuildID, "member_id", msg.Author.ID, "err", err)
+                }</span> else<span class="cov0" title="0"> {
+                        if member.Nick != "" </span><span class="cov0" title="0">{
+                                name = member.Nick
+                        }</span>
+                }
+        }
+
+        <span class="cov0" title="0">data := app.messageInput.sendMessageData
+        data.Reference = &amp;discord.MessageReference{MessageID: ml.selectedMessageID}
+        data.AllowedMentions = &amp;api.AllowedMentions{RepliedUser: option.False}
+
+        title := "Replying to "
+        if mention </span><span class="cov0" title="0">{
+                data.AllowedMentions.RepliedUser = option.True
+                title = "[@] " + title
+        }</span>
+
+        <span class="cov0" title="0">app.messageInput.sendMessageData = data
+        app.messageInput.addTitle(title + name)
+        app.SetFocus(app.messageInput)</span>
+}
+
+func (ml *messagesList) delete() <span class="cov0" title="0">{
+        msg, err := ml.selectedMsg()
+        if err != nil </span><span class="cov0" title="0">{
+                slog.Error("failed to get selected message", "err", err)
+                return
+        }</span>
+
+        <span class="cov0" title="0">if msg.GuildID.IsValid() </span><span class="cov0" title="0">{
+                clientID := discordState.Ready().User.ID
+                if msg.Author.ID != clientID &amp;&amp; !discordState.HasPermissions(msg.ChannelID, discord.PermissionManageMessages) </span><span class="cov0" title="0">{
+                        slog.Error("failed to delete message; missing relevant permissions", "channel_id", msg.ChannelID, "message_id", msg.ID)
+                        return
+                }</span>
+        }
+
+        <span class="cov0" title="0">if err := discordState.DeleteMessage(app.guildsTree.selectedChannelID, msg.ID, ""); err != nil </span><span class="cov0" title="0">{
+                slog.Error("failed to delete message", "channel_id", app.guildsTree.selectedChannelID, "message_id", msg.ID, "err", err)
+                return
+        }</span>
+
+        <span class="cov0" title="0">ml.selectedMessageID = 0
+        ml.Highlight()
+
+        if err := discordState.MessageRemove(app.guildsTree.selectedChannelID, msg.ID); err != nil </span><span class="cov0" title="0">{
+                slog.Error("failed to delete message", "channel_id", app.guildsTree.selectedChannelID, "message_id", msg.ID, "err", err)
+                return
+        }</span>
+
+        // No need to redraw messages after deletion, onMessageDelete will do
+        // its work after the event returns
+}
+
+func (ml *messagesList) requestGuildMembers(gID discord.GuildID, ms []discord.Message) <span class="cov0" title="0">{
+        var usersToFetch []discord.UserID
+        for _, m := range ms </span><span class="cov0" title="0">{
+                if member, _ := discordState.Cabinet.Member(gID, m.Author.ID); member == nil </span><span class="cov0" title="0">{
+                        usersToFetch = append(usersToFetch, m.Author.ID)
+                }</span>
+        }
+
+        <span class="cov0" title="0">if usersToFetch != nil </span><span class="cov0" title="0">{
+                err := discordState.SendGateway(context.TODO(), &amp;gateway.RequestGuildMembersCommand{
+                        GuildIDs: []discord.GuildID{gID},
+                        UserIDs:  slices.Compact(usersToFetch),
+                })
+                if err != nil </span><span class="cov0" title="0">{
+                        slog.Error("failed to request guild members", "guild_id", gID, "err", err)
+                        return
+                }</span>
+
+                <span class="cov0" title="0">ml.setFetchingChunk(true, 0)
+                ml.waitForChunkEvent()</span>
+        }
+}
+
+func (ml *messagesList) setFetchingChunk(value bool, count uint) <span class="cov8" title="1">{
+        ml.fetchingMembers.mu.Lock()
+        defer ml.fetchingMembers.mu.Unlock()
+
+        if ml.fetchingMembers.value == value </span><span class="cov0" title="0">{
+                return
+        }</span>
+
+        <span class="cov8" title="1">ml.fetchingMembers.value = value
+
+        if value </span><span class="cov8" title="1">{
+                ml.fetchingMembers.done = make(chan struct{})
+        }</span> else<span class="cov8" title="1"> {
+                ml.fetchingMembers.count = count
+                close(ml.fetchingMembers.done)
+        }</span>
+}
+
+func (ml *messagesList) waitForChunkEvent() uint <span class="cov8" title="1">{
+        ml.fetchingMembers.mu.Lock()
+        if !ml.fetchingMembers.value </span><span class="cov8" title="1">{
+                ml.fetchingMembers.mu.Unlock()
+                return 0
+        }</span>
+        <span class="cov8" title="1">ml.fetchingMembers.mu.Unlock()
+
+        &lt;-ml.fetchingMembers.done
+        return ml.fetchingMembers.count</span>
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">// Package cmd defines the command-line interface commands
+package cmd
+
+import (
+        "flag"
+        "fmt"
+        "log/slog"
+
+        "github.com/ayn2op/discordo/internal/config"
+        "github.com/ayn2op/discordo/internal/consts"
+        "github.com/ayn2op/discordo/internal/logger"
+        "github.com/ayn2op/tview"
+        "github.com/diamondburned/arikawa/v3/utils/ws"
+        "github.com/diamondburned/ningen/v3"
+        "github.com/zalando/go-keyring"
+)
+
+var (
+        discordState *ningen.State
+        app          *application
+)
+
+func Run() error <span class="cov0" title="0">{
+        tokenFlag := flag.String("token", "", "authentication token")
+        configPath := flag.String("config-path", config.DefaultPath(), "path of the configuration file")
+        logPath := flag.String("log-path", logger.DefaultPath(), "path of the log file")
+        logLevel := flag.String("log-level", "info", "log level")
+        flag.Parse()
+
+        var level slog.Level
+        switch *logLevel </span>{
+        case "debug":<span class="cov0" title="0">
+                ws.EnableRawEvents = true
+                level = slog.LevelDebug</span>
+        case "info":<span class="cov0" title="0">
+                level = slog.LevelInfo</span>
+        case "warn":<span class="cov0" title="0">
+                level = slog.LevelWarn</span>
+        case "error":<span class="cov0" title="0">
+                level = slog.LevelError</span>
+        }
+
+        <span class="cov0" title="0">if err := logger.Load(*logPath, level); err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("failed to load logger: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">cfg, err := config.Load(*configPath)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("failed to load config: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">token := *tokenFlag
+        if token == "" </span><span class="cov0" title="0">{
+                token, err = keyring.Get(consts.Name, "token")
+                if err != nil </span><span class="cov0" title="0">{
+                        slog.Info("failed to retrieve token from keyring", "err", err)
+                }</span>
+        }
+
+        <span class="cov0" title="0">tview.Styles = tview.Theme{}
+        app = newApplication(cfg)
+        return app.run(token)</span>
+}
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package cmd
+
+import (
+        "context"
+        "log/slog"
+
+        "github.com/ayn2op/discordo/internal/http"
+        "github.com/ayn2op/discordo/internal/notifications"
+        "github.com/ayn2op/tview"
+        "github.com/diamondburned/arikawa/v3/api"
+        "github.com/diamondburned/arikawa/v3/gateway"
+        "github.com/diamondburned/arikawa/v3/session"
+        "github.com/diamondburned/arikawa/v3/state"
+        "github.com/diamondburned/arikawa/v3/state/store/defaultstore"
+        "github.com/diamondburned/arikawa/v3/utils/handler"
+        "github.com/diamondburned/arikawa/v3/utils/httputil"
+        "github.com/diamondburned/arikawa/v3/utils/httputil/httpdriver"
+        "github.com/diamondburned/arikawa/v3/utils/ws"
+        "github.com/diamondburned/ningen/v3"
+        "github.com/diamondburned/ningen/v3/states/read"
+)
+
+func openState(token string) error <span class="cov0" title="0">{
+        identifyProps := http.IdentifyProperties()
+
+        api.UserAgent = http.BrowserUserAgent
+        gateway.DefaultIdentity = identifyProps
+        gateway.DefaultPresence = &amp;gateway.UpdatePresenceCommand{
+                Status: app.cfg.Status,
+        }
+
+        id := gateway.DefaultIdentifier(token)
+        id.Compress = false
+
+        session := session.NewCustom(id, http.NewClient(token), handler.New())
+        state := state.NewFromSession(session, defaultstore.New())
+        discordState = ningen.FromState(state)
+
+        // Handlers
+        discordState.AddHandler(onRaw)
+        discordState.AddHandler(onReady)
+        discordState.AddHandler(onMessageCreate)
+        discordState.AddHandler(onMessageUpdate)
+        discordState.AddHandler(onMessageDelete)
+        discordState.AddHandler(onReadUpdate)
+
+        discordState.AddHandler(func(event *gateway.GuildMembersChunkEvent) </span><span class="cov0" title="0">{
+                app.messagesList.setFetchingChunk(false, uint(len(event.Members)))
+        }</span>)
+
+        <span class="cov0" title="0">discordState.AddHandler(func(event *gateway.GuildMemberRemoveEvent) </span><span class="cov0" title="0">{
+                app.messageInput.cache.Invalidate(event.GuildID.String()+" "+event.User.Username, discordState.MemberState.SearchLimit)
+        }</span>)
+
+        <span class="cov0" title="0">discordState.StateLog = func(err error) </span><span class="cov0" title="0">{
+                slog.Error("state log", "err", err)
+        }</span>
+
+        <span class="cov0" title="0">discordState.OnRequest = append(discordState.OnRequest, httputil.WithHeaders(http.Headers()), onRequest)
+        return discordState.Open(context.TODO())</span>
+}
+
+func onRequest(r httpdriver.Request) error <span class="cov0" title="0">{
+        if req, ok := r.(*httpdriver.DefaultRequest); ok </span><span class="cov0" title="0">{
+                slog.Debug("new HTTP request", "method", req.Method, "url", req.URL)
+        }</span>
+
+        <span class="cov0" title="0">return nil</span>
+}
+
+func onRaw(event *ws.RawEvent) <span class="cov0" title="0">{
+        slog.Debug(
+                "new raw event",
+                "code", event.OriginalCode,
+                "type", event.OriginalType,
+                // "data", event.Raw,
+        )
+}</span>
+
+func onReadUpdate(event *read.UpdateEvent) <span class="cov0" title="0">{
+        var guildNode *tview.TreeNode
+        app.guildsTree.
+                GetRoot().
+                Walk(func(node, parent *tview.TreeNode) bool </span><span class="cov0" title="0">{
+                        switch node.GetReference() </span>{
+                        case event.GuildID:<span class="cov0" title="0">
+                                node.SetTextStyle(app.guildsTree.getGuildNodeStyle(event.GuildID))
+                                guildNode = node
+                                return false</span>
+                        case event.ChannelID:<span class="cov0" title="0">
+                                // private channel
+                                if !event.GuildID.IsValid() </span><span class="cov0" title="0">{
+                                        style := app.guildsTree.getChannelNodeStyle(event.ChannelID)
+                                        node.SetTextStyle(style)
+                                        return false
+                                }</span>
+                        }
+
+                        <span class="cov0" title="0">return true</span>
+                })
+
+        <span class="cov0" title="0">if guildNode != nil </span><span class="cov0" title="0">{
+                guildNode.Walk(func(node, parent *tview.TreeNode) bool </span><span class="cov0" title="0">{
+                        if node.GetReference() == event.ChannelID </span><span class="cov0" title="0">{
+                                node.SetTextStyle(app.guildsTree.getChannelNodeStyle(event.ChannelID))
+                                return false
+                        }</span>
+
+                        <span class="cov0" title="0">return true</span>
+                })
+        }
+
+        <span class="cov0" title="0">app.Draw()</span>
+}
+
+func onReady(r *gateway.ReadyEvent) <span class="cov0" title="0">{
+        dmNode := tview.NewTreeNode("Direct Messages")
+        root := app.guildsTree.
+                GetRoot().
+                ClearChildren().
+                AddChild(dmNode)
+
+        for _, folder := range r.UserSettings.GuildFolders </span><span class="cov0" title="0">{
+                if folder.ID == 0 &amp;&amp; len(folder.GuildIDs) == 1 </span><span class="cov0" title="0">{
+                        guild, err := discordState.Cabinet.Guild(folder.GuildIDs[0])
+                        if err != nil </span><span class="cov0" title="0">{
+                                slog.Error(
+                                        "failed to get guild from state",
+                                        "guild_id",
+                                        folder.GuildIDs[0],
+                                        "err",
+                                        err,
+                                )
+                                continue</span>
+                        }
+
+                        <span class="cov0" title="0">app.guildsTree.createGuildNode(root, *guild)</span>
+                } else<span class="cov0" title="0"> {
+                        app.guildsTree.createFolderNode(folder)
+                }</span>
+        }
+
+        <span class="cov0" title="0">app.guildsTree.SetCurrentNode(root)
+        app.SetFocus(app.guildsTree)
+        app.Draw()</span>
+}
+
+func onMessageCreate(message *gateway.MessageCreateEvent) <span class="cov0" title="0">{
+        if app.guildsTree.selectedChannelID == message.ChannelID </span><span class="cov0" title="0">{
+                app.messagesList.drawMessage(message.Message)
+                app.Draw()
+        }</span>
+
+        <span class="cov0" title="0">if err := notifications.Notify(discordState, message, app.cfg); err != nil </span><span class="cov0" title="0">{
+                slog.Error("Notification failed", "err", err)
+        }</span>
+}
+
+func onMessageUpdate(message *gateway.MessageUpdateEvent) <span class="cov0" title="0">{
+        if app.guildsTree.selectedChannelID == message.ChannelID </span><span class="cov0" title="0">{
+                onMessageDelete(&amp;gateway.MessageDeleteEvent{ID: message.ID, ChannelID: message.ChannelID, GuildID: message.GuildID})
+        }</span>
+}
+
+func onMessageDelete(message *gateway.MessageDeleteEvent) <span class="cov0" title="0">{
+        if app.guildsTree.selectedChannelID == message.ChannelID </span><span class="cov0" title="0">{
+                messages, err := discordState.Cabinet.Messages(message.ChannelID)
+                if err != nil </span><span class="cov0" title="0">{
+                        slog.Error("failed to get messages from state", "err", err, "channel_id", message.ChannelID)
+                        return
+                }</span>
+
+                <span class="cov0" title="0">app.messagesList.reset()
+                app.messagesList.drawMessages(messages)
+                app.Draw()</span>
+        }
+}
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">// Package cache is used for completion to not overflow the gateway with redundant search requests.
+package cache
+
+import (
+        "sync"
+)
+
+type Cache struct {
+        items sync.Map
+}
+
+func NewCache() *Cache <span class="cov0" title="0">{
+        return &amp;Cache{items: sync.Map{}}
+}</span>
+
+func (c *Cache) Create(query string, value uint) <span class="cov0" title="0">{
+        c.items.Store(query, value)
+}</span>
+
+func (c *Cache) Exists(query string) (ok bool) <span class="cov0" title="0">{
+        _, ok = c.items.Load(query)
+        return
+}</span>
+
+func (c *Cache) Get(query string) uint <span class="cov0" title="0">{
+        i, _ := c.items.Load(query)
+        return i.(uint)
+}</span>
+
+// Invalidate is only needed when a member leaves and the search query reaches
+// the search limit.
+// "aa", "ab", "ac", ..., "ay" // where length is longer than the limit
+// if "ay" leaves, then "az" would not be loaded becaue it would not be
+// returned by the search results because of the search limit
+func (c *Cache) Invalidate(name string, limit uint) <span class="cov0" title="0">{
+        for name != "" </span><span class="cov0" title="0">{
+                if c.Exists(name) &amp;&amp; c.Get(name) &gt;= limit </span><span class="cov0" title="0">{
+                        for name != "" </span><span class="cov0" title="0">{
+                                c.items.Delete(name)
+                                name = name[:len(name)-1]
+                        }</span>
+                }
+                <span class="cov0" title="0">name = name[:len(name)-1]</span>
+        }
+}
+</pre>
+		
+		<pre class="file" id="file7" style="display: none">package config
+
+import "github.com/ayn2op/tview"
+
+type (
+        TitleTheme struct {
+                ThemeStyle
+                Alignment AlignmentWrapper `toml:"alignment"`
+        }
+
+        BorderTheme struct {
+                ThemeStyle
+                Enabled bool   `toml:"enabled"`
+                Padding [4]int `toml:"padding"`
+
+                NormalSet BorderSetWrapper `toml:"normal_set"`
+                ActiveSet BorderSetWrapper `toml:"active_set"`
+        }
+)
+
+type BorderSetWrapper struct{ tview.BorderSet }
+
+func (bw *BorderSetWrapper) UnmarshalTOML(val any) error <span class="cov0" title="0">{
+        s, ok := val.(string)
+        if !ok </span><span class="cov0" title="0">{
+                return errInvalidType
+        }</span>
+
+        <span class="cov0" title="0">switch s </span>{
+        case "hidden":<span class="cov0" title="0">
+                bw.BorderSet = tview.BorderSetHidden()</span>
+        case "plain":<span class="cov0" title="0">
+                bw.BorderSet = tview.BorderSetPlain()</span>
+        case "round":<span class="cov0" title="0">
+                bw.BorderSet = tview.BorderSetRound()</span>
+        case "thick":<span class="cov0" title="0">
+                bw.BorderSet = tview.BorderSetThick()</span>
+        case "double":<span class="cov0" title="0">
+                bw.BorderSet = tview.BorderSetDouble()</span>
+        }
+
+        <span class="cov0" title="0">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file8" style="display: none">package config
+
+import (
+        _ "embed"
+        "fmt"
+        "log/slog"
+        "os"
+        "path/filepath"
+
+        "github.com/BurntSushi/toml"
+        "github.com/ayn2op/discordo/internal/consts"
+        "github.com/diamondburned/arikawa/v3/discord"
+)
+
+const fileName = "config.toml"
+
+type (
+        Timestamps struct {
+                Enabled bool   `toml:"enabled"`
+                Format  string `toml:"format"`
+        }
+
+        Notifications struct {
+                Enabled  bool  `toml:"enabled"`
+                Duration int   `toml:"duration"`
+                Sound    Sound `toml:"sound"`
+        }
+
+        Sound struct {
+                Enabled    bool `toml:"enabled"`
+                OnlyOnPing bool `toml:"only_on_ping"`
+        }
+
+        Config struct {
+                Mouse  bool   `toml:"mouse"`
+                Editor string `toml:"editor"`
+
+                Status discord.Status `toml:"status"`
+
+                Markdown            bool `toml:"markdown"`
+                HideBlockedUsers    bool `toml:"hide_blocked_users"`
+                ShowAttachmentLinks bool `toml:"show_attachment_links"`
+
+                // Use 0 to disable
+                AutocompleteLimit uint8 `toml:"autocomplete_limit"`
+                MessagesLimit     uint8 `toml:"messages_limit"`
+
+                Timestamps    Timestamps    `toml:"timestamps"`
+                Notifications Notifications `toml:"notifications"`
+
+                Keys  Keys  `toml:"keys"`
+                Theme Theme `toml:"theme"`
+        }
+)
+
+//go:embed config.toml
+var defaultCfg []byte
+
+func DefaultPath() string <span class="cov0" title="0">{
+        path, err := os.UserConfigDir()
+        if err != nil </span><span class="cov0" title="0">{
+                slog.Info(
+                        "user config dir cannot be determined; falling back to the current dir",
+                        "err", err,
+                )
+                path = "."
+        }</span>
+
+        <span class="cov0" title="0">return filepath.Join(path, consts.Name, fileName)</span>
+}
+
+// Load reads the configuration file and parses it.
+func Load(path string) (*Config, error) <span class="cov0" title="0">{
+        var cfg Config
+        if err := toml.Unmarshal(defaultCfg, &amp;cfg); err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to unmarshal default config: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">file, err := os.Open(path)
+        if os.IsNotExist(err) </span><span class="cov0" title="0">{
+                slog.Info(
+                        "config file does not exist, falling back to the default config",
+                        "path",
+                        path,
+                        "err",
+                        err,
+                )
+        }</span> else<span class="cov0" title="0"> {
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, fmt.Errorf("failed to open config file: %w", err)
+                }</span>
+                <span class="cov0" title="0">defer file.Close()
+
+                if _, err := toml.NewDecoder(file).Decode(&amp;cfg); err != nil </span><span class="cov0" title="0">{
+                        return nil, fmt.Errorf("failed to decode config: %w", err)
+                }</span>
+        }
+
+        // set defaults
+        <span class="cov0" title="0">if cfg.Editor == "default" </span><span class="cov0" title="0">{
+                cfg.Editor = os.Getenv("EDITOR")
+        }</span>
+
+        <span class="cov0" title="0">if cfg.Status == "default" </span><span class="cov0" title="0">{
+                cfg.Status = ""
+        }</span>
+
+        <span class="cov0" title="0">return &amp;cfg, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file9" style="display: none">package config
+
+import (
+        "errors"
+
+        "github.com/ayn2op/tview"
+        "github.com/gdamore/tcell/v2"
+)
+
+var errInvalidType = errors.New("invalid type")
+
+type AlignmentWrapper struct{ tview.Alignment }
+
+func (aw *AlignmentWrapper) UnmarshalTOML(v any) error <span class="cov0" title="0">{
+        s, ok := v.(string)
+        if !ok </span><span class="cov0" title="0">{
+                return errInvalidType
+        }</span>
+
+        <span class="cov0" title="0">switch s </span>{
+        case "left":<span class="cov0" title="0">
+                aw.Alignment = tview.AlignmentLeft</span>
+        case "center":<span class="cov0" title="0">
+                aw.Alignment = tview.AlignmentCenter</span>
+        case "right":<span class="cov0" title="0">
+                aw.Alignment = tview.AlignmentRight</span>
+        }
+
+        <span class="cov0" title="0">return nil</span>
+}
+
+type StyleWrapper struct{ tcell.Style }
+
+func NewStyleWrapper(style tcell.Style) StyleWrapper <span class="cov0" title="0">{
+        return StyleWrapper{Style: style}
+}</span>
+
+func (sw *StyleWrapper) UnmarshalTOML(v any) error <span class="cov0" title="0">{
+        m, ok := v.(map[string]any)
+        if !ok </span><span class="cov0" title="0">{
+                return errInvalidType
+        }</span>
+
+        <span class="cov0" title="0">for key, val := range m </span><span class="cov0" title="0">{
+                switch key </span>{
+                case "foreground":<span class="cov0" title="0">
+                        s, ok := val.(string)
+                        if !ok </span><span class="cov0" title="0">{
+                                continue</span>
+                        }
+
+                        <span class="cov0" title="0">color := tcell.GetColor(s)
+                        sw.Style = sw.Foreground(color)</span>
+                case "background":<span class="cov0" title="0">
+                        s, ok := val.(string)
+                        if !ok </span><span class="cov0" title="0">{
+                                continue</span>
+                        }
+
+                        <span class="cov0" title="0">color := tcell.GetColor(s)
+                        sw.Style = sw.Background(color)</span>
+                case "attributes":<span class="cov0" title="0">
+                        var attrs tcell.AttrMask
+                        switch val := val.(type) </span>{
+                        case string:<span class="cov0" title="0">
+                                attrs |= stringToAttrMask(val)</span>
+                        case []any:<span class="cov0" title="0">
+                                for _, attr := range val </span><span class="cov0" title="0">{
+                                        s, ok := attr.(string)
+                                        if !ok </span><span class="cov0" title="0">{
+                                                continue</span>
+                                        }
+
+                                        <span class="cov0" title="0">attrs |= stringToAttrMask(s)</span>
+                                }
+
+                        }
+
+                        <span class="cov0" title="0">sw.Style = sw.Attributes(attrs)</span>
+                }
+        }
+
+        <span class="cov0" title="0">return nil</span>
+}
+
+type (
+        ThemeStyle struct {
+                NormalStyle StyleWrapper `toml:"normal_style"`
+                ActiveStyle StyleWrapper `toml:"active_style"`
+        }
+
+        GuildsTreeTheme struct {
+                AutoExpandFolders bool   `toml:"auto_expand_folders"`
+                Graphics          bool   `toml:"graphics"`
+                GraphicsColor     string `toml:"graphics_color"`
+        }
+
+        MessagesListTheme struct {
+                ReplyIndicator     string       `toml:"reply_indicator"`
+                ForwardedIndicator string       `toml:"forwarded_indicator"`
+                AuthorStyle        StyleWrapper `toml:"author_style"`
+                MentionStyle       StyleWrapper `toml:"mention_style"`
+                EmojiStyle         StyleWrapper `toml:"emoji_style"`
+                URLStyle           StyleWrapper `toml:"url_style"`
+                AttachmentStyle    StyleWrapper `toml:"attachment_style"`
+        }
+
+        MentionsListTheme struct {
+                MinWidth  uint `toml:"min_width"`
+                MaxHeight uint `toml:"max_height"`
+        }
+
+        Theme struct {
+                Title        TitleTheme        `toml:"title"`
+                Border       BorderTheme       `toml:"border"`
+                GuildsTree   GuildsTreeTheme   `toml:"guilds_tree"`
+                MessagesList MessagesListTheme `toml:"messages_list"`
+                MentionsList MentionsListTheme `toml:"mentions_list"`
+        }
+)
+
+func stringToAttrMask(s string) tcell.AttrMask <span class="cov0" title="0">{
+        switch s </span>{
+        case "bold":<span class="cov0" title="0">
+                return tcell.AttrBold</span>
+        case "blink":<span class="cov0" title="0">
+                return tcell.AttrBlink</span>
+        case "reverse":<span class="cov0" title="0">
+                return tcell.AttrReverse</span>
+        case "underline":<span class="cov0" title="0">
+                return tcell.AttrUnderline</span>
+        case "dim":<span class="cov0" title="0">
+                return tcell.AttrDim</span>
+        case "italic":<span class="cov0" title="0">
+                return tcell.AttrItalic</span>
+        case "strikethrough":<span class="cov0" title="0">
+                return tcell.AttrStrikeThrough</span>
+        default:<span class="cov0" title="0">
+                return tcell.AttrNone</span>
+        }
+}
+</pre>
+		
+		<pre class="file" id="file10" style="display: none">package consts
+
+import (
+        "log/slog"
+        "os"
+        "path/filepath"
+)
+
+const Name = "discordo"
+
+var cacheDir string
+
+func CacheDir() string <span class="cov0" title="0">{
+        return cacheDir
+}</span>
+
+func init() <span class="cov0" title="0">{
+        userCacheDir, err := os.UserCacheDir()
+        if err != nil </span><span class="cov0" title="0">{
+                userCacheDir = os.TempDir()
+                slog.Warn("failed to get user cache dir; falling back to temp dir", "err", err, "path", userCacheDir)
+        }</span>
+
+        <span class="cov0" title="0">cacheDir = filepath.Join(userCacheDir, Name)
+        if err := os.MkdirAll(cacheDir, os.ModePerm); err != nil </span><span class="cov0" title="0">{
+                slog.Error("failed to create cache dir", "err", err, "path", cacheDir)
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file11" style="display: none">package http
+
+import (
+        "net/http"
+
+        "github.com/diamondburned/arikawa/v3/api"
+        "github.com/diamondburned/arikawa/v3/utils/httputil"
+        "github.com/diamondburned/arikawa/v3/utils/httputil/httpdriver"
+)
+
+func NewClient(token string) *api.Client <span class="cov8" title="1">{
+        stdClient := http.DefaultClient
+        stdClient.Transport = NewTransport()
+        httpClient := httputil.NewClientWithDriver(httpdriver.WrapClient(*stdClient))
+        return api.NewCustomClient(token, httpClient)
+}</span>
+</pre>
+		
+		<pre class="file" id="file12" style="display: none">package http
+
+import (
+        stdHttp "net/http"
+)
+
+func Headers() stdHttp.Header <span class="cov8" title="1">{
+        headers := make(stdHttp.Header)
+        // https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers
+        headers.Set("Accept", "*/*")
+        headers.Set("Accept-Encoding", "gzip, deflate, br, zstd")
+        headers.Set("Accept-Language", "en-US,en;q=0.9")
+        headers.Set("Origin", "https://discord.com")
+        headers.Set("Priority", "u=0, i")
+        headers.Set("Referer", "https://discord.com/channels/@me")
+        headers.Set("Sec-Fetch-Dest", "empty")
+        headers.Set("Sec-Fetch-Mode", "cors")
+        headers.Set("Sec-Fetch-Site", "same-origin")
+
+        headers.Set("X-Debug-Options", "bugReporterEnabled")
+        headers.Set("X-Discord-Locale", string(Locale))
+
+        if superProps, err := superProps(); err == nil </span><span class="cov8" title="1">{
+                headers.Set("X-Super-Properties", superProps)
+        }</span>
+
+        <span class="cov8" title="1">return headers</span>
+}
+</pre>
+		
+		<pre class="file" id="file13" style="display: none">package http
+
+import (
+        "encoding/base64"
+        "encoding/json"
+
+        "github.com/diamondburned/arikawa/v3/discord"
+        "github.com/diamondburned/arikawa/v3/gateway"
+        "github.com/google/uuid"
+)
+
+const (
+        Browser          = "Chrome"
+        BrowserVersion   = "140.0.0.0"
+        BrowserUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+)
+
+var (
+        Locale = discord.EnglishUS
+)
+
+func IdentifyProperties() gateway.IdentifyProperties <span class="cov8" title="1">{
+        return gateway.IdentifyProperties{
+                gateway.IdentifyDevice: "",
+
+                gateway.IdentifyOS: "Windows",
+                "os_version":       "10",
+
+                gateway.IdentifyBrowser: Browser,
+                "browser_version":       BrowserVersion,
+                "browser_user_agent":    BrowserUserAgent,
+
+                "client_build_number": 447677,
+                "client_event_source": nil,
+                "client_launch_id":    uuid.NewString(),
+                "client_app_state":    "focused",
+
+                "launch_signature": uuid.NewString(),
+                "system_locale":    Locale,
+                "release_channel":  "stable",
+                "has_client_mods":  false,
+
+                "referrer":                 "",
+                "referrer_current":         "",
+                "referring_domain":         "",
+                "referring_domain_current": "",
+
+                // These properties are only sent when identifying with the gateway and are not included in the X-Super-Properties header.
+                "is_fast_connect":         false,
+                "gateway_connect_reasons": "AppSkeleton",
+        }
+}</span>
+
+func superProps() (string, error) <span class="cov8" title="1">{
+        props := IdentifyProperties()
+        delete(props, "is_fast_connect")
+        delete(props, "gateway_connect_reasons")
+
+        raw, err := json.Marshal(props)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+
+        <span class="cov8" title="1">return base64.StdEncoding.EncodeToString(raw), nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file14" style="display: none">package http
+
+import (
+        "io"
+        "net/http"
+
+        "github.com/andybalholm/brotli"
+        "github.com/klauspost/compress/gzip"
+        "github.com/klauspost/compress/zstd"
+)
+
+type Transport struct {
+        base http.RoundTripper
+}
+
+func NewTransport() *Transport <span class="cov8" title="1">{
+        return &amp;Transport{
+                base: http.DefaultTransport,
+        }
+}</span>
+
+func (t *Transport) RoundTrip(req *http.Request) (*http.Response, error) <span class="cov8" title="1">{
+        resp, err := t.base.RoundTrip(req)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">switch resp.Header.Get("Content-Encoding") </span>{
+        case "gzip":<span class="cov0" title="0">
+                resp.Body, err = gzip.NewReader(resp.Body)
+                if err != nil </span><span class="cov0" title="0">{
+                        resp.Body.Close()
+                        return nil, err
+                }</span>
+
+                <span class="cov0" title="0">resp.Header.Del("Content-Encoding")</span>
+        case "zstd":<span class="cov8" title="1">
+                decoder, err := zstd.NewReader(resp.Body)
+                if err != nil </span><span class="cov0" title="0">{
+                        resp.Body.Close()
+                        return nil, err
+                }</span>
+
+                <span class="cov8" title="1">resp.Body = io.NopCloser(decoder)
+                resp.Header.Del("Content-Encoding")</span>
+        case "br":<span class="cov8" title="1">
+                resp.Body = io.NopCloser(brotli.NewReader(resp.Body))
+                resp.Header.Del("Content-Encoding")</span>
+        }
+
+        <span class="cov8" title="1">return resp, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file15" style="display: none">package logger
+
+import (
+        "fmt"
+        "log/slog"
+        "os"
+        "path/filepath"
+
+        "github.com/ayn2op/discordo/internal/consts"
+        "github.com/lmittmann/tint"
+)
+
+const fileName = "logs.txt"
+
+func DefaultPath() string <span class="cov8" title="1">{
+        return filepath.Join(consts.CacheDir(), fileName)
+}</span>
+
+// Load opens the log file and configures default logger.
+func Load(path string, level slog.Level) error <span class="cov8" title="1">{
+        if err := os.MkdirAll(filepath.Dir(path), os.ModePerm); err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+
+        <span class="cov8" title="1">file, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, os.ModePerm)
+        if err != nil </span><span class="cov8" title="1">{
+                return fmt.Errorf("failed to open log file: %w", err)
+        }</span>
+
+        <span class="cov8" title="1">opts := &amp;tint.Options{Level: level}
+        handler := tint.NewHandler(file, opts)
+        slog.SetDefault(slog.New(handler))
+        return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file16" style="display: none">package login
+
+import (
+        "errors"
+        "log/slog"
+
+        "github.com/ayn2op/discordo/internal/config"
+        "github.com/ayn2op/discordo/internal/consts"
+        "github.com/ayn2op/discordo/internal/http"
+        "github.com/ayn2op/discordo/internal/ui"
+        "github.com/ayn2op/tview"
+        "github.com/diamondburned/arikawa/v3/api"
+        "github.com/zalando/go-keyring"
+)
+
+const (
+        formPageName  = "form"
+        errorPageName = "error"
+)
+
+type DoneFn = func(token string)
+
+type Form struct {
+        *tview.Pages
+        cfg  *config.Config
+        form *tview.Form
+        done DoneFn
+}
+
+func NewForm(cfg *config.Config, done DoneFn) *Form <span class="cov0" title="0">{
+        f := &amp;Form{
+                Pages: tview.NewPages(),
+                cfg:   cfg,
+                form:  tview.NewForm(),
+                done:  done,
+        }
+
+        f.form.
+                AddInputField("Email", "", 0, nil, nil).
+                AddPasswordField("Password", "", 0, 0, nil).
+                AddPasswordField("Code (optional)", "", 0, 0, nil).
+                AddButton("Login", f.login)
+        f.AddAndSwitchToPage(formPageName, f.form, true)
+        return f
+}</span>
+
+func (f *Form) login() <span class="cov0" title="0">{
+        email := f.form.GetFormItem(0).(*tview.InputField).GetText()
+        password := f.form.GetFormItem(1).(*tview.InputField).GetText()
+        if email == "" || password == "" </span><span class="cov0" title="0">{
+                return
+        }</span>
+
+        // Create an API client without an authentication token.
+        <span class="cov0" title="0">client := api.NewClient("")
+        props := http.IdentifyProperties()
+        if browserUserAgent, ok := props["browser_user_agent"]; ok </span><span class="cov0" title="0">{
+                if val, ok := browserUserAgent.(string); ok </span><span class="cov0" title="0">{
+                        api.UserAgent = val
+                }</span>
+        }
+
+        <span class="cov0" title="0">resp, err := client.Login(email, password)
+        if err != nil </span><span class="cov0" title="0">{
+                f.onError(err)
+                return
+        }</span>
+
+        <span class="cov0" title="0">if resp.Token == "" &amp;&amp; resp.MFA </span><span class="cov0" title="0">{
+                code := f.form.GetFormItem(2).(*tview.InputField).GetText()
+                if code == "" </span><span class="cov0" title="0">{
+                        f.onError(errors.New("code required"))
+                        return
+                }</span>
+
+                // Attempt to login using the code.
+                <span class="cov0" title="0">resp, err = client.TOTP(code, resp.Ticket)
+                if err != nil </span><span class="cov0" title="0">{
+                        f.onError(err)
+                        return
+                }</span>
+        }
+
+        <span class="cov0" title="0">if resp.Token == "" </span><span class="cov0" title="0">{
+                f.onError(errors.New("missing token"))
+                return
+        }</span>
+
+        <span class="cov0" title="0">go keyring.Set(consts.Name, "token", resp.Token)
+
+        if f.done != nil </span><span class="cov0" title="0">{
+                f.done(resp.Token)
+        }</span>
+}
+
+func (f *Form) onError(err error) <span class="cov0" title="0">{
+        slog.Error("failed to login", "err", err)
+
+        modal := tview.NewModal().
+                SetText(err.Error()).
+                AddButtons([]string{"Close"}).
+                SetDoneFunc(func(_ int, _ string) </span><span class="cov0" title="0">{
+                        f.
+                                RemovePage(errorPageName).
+                                SwitchToPage(formPageName)
+                }</span>)
+        <span class="cov0" title="0">f.
+                AddAndSwitchToPage(errorPageName, ui.Centered(modal, 0, 0), true).
+                ShowPage(formPageName)</span>
+}
+</pre>
+		
+		<pre class="file" id="file17" style="display: none">// Package markdown defines a renderer for tview style tags.
+package markdown
+
+import (
+        "fmt"
+        "io"
+        "strconv"
+        "strings"
+
+        "github.com/ayn2op/discordo/internal/config"
+        "github.com/ayn2op/tview"
+        "github.com/diamondburned/ningen/v3/discordmd"
+        "github.com/gdamore/tcell/v2"
+        "github.com/yuin/goldmark/ast"
+        gmr "github.com/yuin/goldmark/renderer"
+)
+
+var DefaultRenderer = newRenderer()
+
+type renderer struct {
+        config *gmr.Config
+
+        listIx     *int
+        listNested int
+}
+
+func newRenderer() *renderer <span class="cov0" title="0">{
+        config := gmr.NewConfig()
+        return &amp;renderer{config: config}
+}</span>
+
+// AddOptions implements renderer.Renderer.
+func (r *renderer) AddOptions(opts ...gmr.Option) <span class="cov0" title="0">{
+        for _, opt := range opts </span><span class="cov0" title="0">{
+                opt.SetConfig(r.config)
+        }</span>
+}
+
+func (r *renderer) Render(w io.Writer, source []byte, node ast.Node) error <span class="cov0" title="0">{
+        theme := r.config.Options["theme"].(config.Theme)
+        return ast.Walk(node, func(node ast.Node, entering bool) (ast.WalkStatus, error) </span><span class="cov0" title="0">{
+                switch node := node.(type) </span>{
+                case *ast.Document:<span class="cov0" title="0"></span>
+                // noop
+                case *ast.Heading:<span class="cov0" title="0">
+                        r.renderHeading(w, node, entering)</span>
+                case *ast.Text:<span class="cov0" title="0">
+                        r.renderText(w, node, entering, source)</span>
+                case *ast.FencedCodeBlock:<span class="cov0" title="0">
+                        r.renderFencedCodeBlock(w, node, entering, source)</span>
+                case *ast.AutoLink:<span class="cov0" title="0">
+                        r.renderAutoLink(w, node, entering, source, theme.MessagesList.URLStyle.Style)</span>
+                case *ast.Link:<span class="cov0" title="0">
+                        r.renderLink(w, node, entering, theme.MessagesList.URLStyle.Style)</span>
+                case *ast.List:<span class="cov0" title="0">
+                        r.renderList(w, node, entering)</span>
+                case *ast.ListItem:<span class="cov0" title="0">
+                        r.renderListItem(w, entering)</span>
+
+                case *discordmd.Inline:<span class="cov0" title="0">
+                        r.renderInline(w, node, entering)</span>
+                case *discordmd.Mention:<span class="cov0" title="0">
+                        r.renderMention(w, node, entering, theme.MessagesList.MentionStyle.Style)</span>
+                case *discordmd.Emoji:<span class="cov0" title="0">
+                        r.renderEmoji(w, node, entering, theme.MessagesList.EmojiStyle.Style)</span>
+                }
+
+                <span class="cov0" title="0">return ast.WalkContinue, nil</span>
+        })
+}
+
+func (r *renderer) renderHeading(w io.Writer, node *ast.Heading, entering bool) <span class="cov0" title="0">{
+        if entering </span><span class="cov0" title="0">{
+                io.WriteString(w, strings.Repeat("#", node.Level))
+                io.WriteString(w, " ")
+        }</span> else<span class="cov0" title="0"> {
+                io.WriteString(w, tview.NewLine)
+        }</span>
+}
+
+func (r *renderer) renderFencedCodeBlock(w io.Writer, node *ast.FencedCodeBlock, entering bool, source []byte) <span class="cov0" title="0">{
+        io.WriteString(w, tview.NewLine)
+
+        if entering </span><span class="cov0" title="0">{
+                // language
+                if l := node.Language(source); l != nil </span><span class="cov0" title="0">{
+                        io.WriteString(w, "|=&gt; ")
+                        w.Write(l)
+                        io.WriteString(w, tview.NewLine)
+                }</span>
+
+                // body
+                <span class="cov0" title="0">lines := node.Lines()
+                for i := range lines.Len() </span><span class="cov0" title="0">{
+                        line := lines.At(i)
+                        io.WriteString(w, "| ")
+                        w.Write(line.Value(source))
+                }</span>
+        }
+}
+
+func (r *renderer) renderAutoLink(w io.Writer, node *ast.AutoLink, entering bool, source []byte, urlStyle tcell.Style) <span class="cov0" title="0">{
+        if entering </span><span class="cov0" title="0">{
+                fg, bg, _ := urlStyle.Decompose()
+                fmt.Fprintf(w, "[%s:%s]", fg, bg)
+                w.Write(node.URL(source))
+        }</span> else<span class="cov0" title="0"> {
+                io.WriteString(w, "[-:-]")
+        }</span>
+}
+
+func (r *renderer) renderLink(w io.Writer, node *ast.Link, entering bool, urlStyle tcell.Style) <span class="cov0" title="0">{
+        if entering </span><span class="cov0" title="0">{
+                fg, bg, _ := urlStyle.Decompose()
+                fmt.Fprintf(w, "[%s:%s::%s]", fg, bg, node.Destination)
+        }</span> else<span class="cov0" title="0"> {
+                io.WriteString(w, "[-:-::-]")
+        }</span>
+}
+
+func (r *renderer) renderList(w io.Writer, node *ast.List, entering bool) <span class="cov0" title="0">{
+        if node.IsOrdered() </span><span class="cov0" title="0">{
+                r.listIx = &amp;node.Start
+        }</span> else<span class="cov0" title="0"> {
+                r.listIx = nil
+        }</span>
+
+        <span class="cov0" title="0">if entering </span><span class="cov0" title="0">{
+                io.WriteString(w, tview.NewLine)
+                r.listNested++
+        }</span> else<span class="cov0" title="0"> {
+                r.listNested--
+        }</span>
+}
+
+func (r *renderer) renderListItem(w io.Writer, entering bool) <span class="cov0" title="0">{
+        if entering </span><span class="cov0" title="0">{
+                io.WriteString(w, strings.Repeat("  ", r.listNested-1))
+
+                if r.listIx != nil </span><span class="cov0" title="0">{
+                        io.WriteString(w, strconv.Itoa(*r.listIx))
+                        io.WriteString(w, ". ")
+                        *r.listIx++
+                }</span> else<span class="cov0" title="0"> {
+                        io.WriteString(w, "- ")
+                }</span>
+        } else<span class="cov0" title="0"> {
+                io.WriteString(w, tview.NewLine)
+        }</span>
+}
+
+func (r *renderer) renderText(w io.Writer, node *ast.Text, entering bool, source []byte) <span class="cov0" title="0">{
+        if entering </span><span class="cov0" title="0">{
+                w.Write(node.Segment.Value(source))
+                switch </span>{
+                case node.HardLineBreak():<span class="cov0" title="0">
+                        io.WriteString(w, strings.Repeat(tview.NewLine, 2))</span>
+                case node.SoftLineBreak():<span class="cov0" title="0">
+                        io.WriteString(w, tview.NewLine)</span>
+                }
+        }
+}
+func (r *renderer) renderInline(w io.Writer, node *discordmd.Inline, entering bool) <span class="cov0" title="0">{
+        if start, end := attrToTag(node.Attr); entering &amp;&amp; start != "" </span><span class="cov0" title="0">{
+                io.WriteString(w, start)
+        }</span> else<span class="cov0" title="0"> {
+                io.WriteString(w, end)
+        }</span>
+}
+
+func (r *renderer) renderMention(w io.Writer, node *discordmd.Mention, entering bool, style tcell.Style) <span class="cov0" title="0">{
+        if entering </span><span class="cov0" title="0">{
+                fg, bg, _ := style.Decompose()
+                fmt.Fprintf(w, "[%s:%s:b]", fg, bg)
+
+                switch </span>{
+                case node.Channel != nil:<span class="cov0" title="0">
+                        io.WriteString(w, "#"+node.Channel.Name)</span>
+                case node.GuildUser != nil:<span class="cov0" title="0">
+                        name := node.GuildUser.DisplayOrUsername()
+                        if member := node.GuildUser.Member; member != nil &amp;&amp; member.Nick != "" </span><span class="cov0" title="0">{
+                                name = member.Nick
+                        }</span>
+
+                        <span class="cov0" title="0">io.WriteString(w, "@"+name)</span>
+                case node.GuildRole != nil:<span class="cov0" title="0">
+                        io.WriteString(w, "@"+node.GuildRole.Name)</span>
+                }
+        } else<span class="cov0" title="0"> {
+                io.WriteString(w, "[-:-:B]")
+        }</span>
+}
+
+func (r *renderer) renderEmoji(w io.Writer, node *discordmd.Emoji, entering bool, emojiStyle tcell.Style) <span class="cov0" title="0">{
+        if entering </span><span class="cov0" title="0">{
+                fg, bg, _ := emojiStyle.Decompose()
+                fmt.Fprintf(w, "[%s:%s]", fg, bg)
+                io.WriteString(w, ":"+node.Name+":")
+        }</span> else<span class="cov0" title="0"> {
+                io.WriteString(w, "[-:-]")
+        }</span>
+}
+
+func attrToTag(attr discordmd.Attribute) (string, string) <span class="cov0" title="0">{
+        switch attr </span>{
+        case discordmd.AttrBold:<span class="cov0" title="0">
+                return "[::b]", "[::B]"</span>
+        case discordmd.AttrItalics:<span class="cov0" title="0">
+                return "[::i]", "[::I]"</span>
+        case discordmd.AttrUnderline:<span class="cov0" title="0">
+                return "[::u]", "[::U]"</span>
+        case discordmd.AttrStrikethrough:<span class="cov0" title="0">
+                return "[::s]", "[::S]"</span>
+        case discordmd.AttrMonospace:<span class="cov0" title="0">
+                return "[::r]", "[::R]"</span>
+        default:<span class="cov0" title="0">
+                return "", ""</span>
+        }
+}
+</pre>
+		
+		<pre class="file" id="file18" style="display: none">//go:build !darwin
+
+package notifications
+
+import "github.com/gen2brain/beeep"
+
+func sendDesktopNotification(title string, message string, image string, playSound bool, duration int) error <span class="cov0" title="0">{
+        if err := beeep.Notify(title, message, image); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov0" title="0">if playSound </span><span class="cov0" title="0">{
+                return beeep.Beep(beeep.DefaultFreq, duration)
+        }</span>
+
+        <span class="cov0" title="0">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file19" style="display: none">package notifications
+
+import (
+        "fmt"
+        "io"
+        "log/slog"
+        "net/http"
+        "os"
+        "path/filepath"
+
+        "github.com/ayn2op/discordo/internal/config"
+        "github.com/ayn2op/discordo/internal/consts"
+        "github.com/diamondburned/arikawa/v3/discord"
+        "github.com/diamondburned/arikawa/v3/gateway"
+        "github.com/diamondburned/ningen/v3"
+)
+
+func Notify(state *ningen.State, msg *gateway.MessageCreateEvent, cfg *config.Config) error <span class="cov0" title="0">{
+        if !cfg.Notifications.Enabled || cfg.Status == discord.DoNotDisturbStatus </span><span class="cov0" title="0">{
+                return nil
+        }</span>
+
+        <span class="cov0" title="0">mentions := state.MessageMentions(&amp;msg.Message)
+        if mentions == 0 </span><span class="cov0" title="0">{
+                return nil
+        }</span>
+
+        // Handle sent files
+        <span class="cov0" title="0">content := msg.Content
+        if msg.Content == "" &amp;&amp; len(msg.Attachments) &gt; 0 </span><span class="cov0" title="0">{
+                content = "Uploaded " + msg.Attachments[0].Filename
+        }</span>
+
+        <span class="cov0" title="0">if content == "" </span><span class="cov0" title="0">{
+                return nil
+        }</span>
+
+        <span class="cov0" title="0">title := msg.Author.DisplayOrUsername()
+
+        channel, err := state.Cabinet.Channel(msg.ChannelID)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("failed to get channel from state: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">if channel.GuildID.IsValid() </span><span class="cov0" title="0">{
+                guild, err := state.Cabinet.Guild(channel.GuildID)
+                if err != nil </span><span class="cov0" title="0">{
+                        return fmt.Errorf("failed to get guild from state: %w", err)
+                }</span>
+
+                <span class="cov0" title="0">if member := msg.Member; member != nil &amp;&amp; member.Nick != "" </span><span class="cov0" title="0">{
+                        title = member.Nick
+                }</span>
+
+                <span class="cov0" title="0">title += " (#" + channel.Name + ", " + guild.Name + ")"</span>
+        }
+
+        <span class="cov0" title="0">hash := msg.Author.Avatar
+        if hash == "" </span><span class="cov0" title="0">{
+                hash = "default"
+        }</span>
+
+        <span class="cov0" title="0">imagePath, err := getCachedProfileImage(hash, msg.Author.AvatarURLWithType(discord.PNGImage))
+        if err != nil </span><span class="cov0" title="0">{
+                slog.Info("failed to get profile image from cache for notification", "err", err, "hash", hash)
+        }</span>
+
+        <span class="cov0" title="0">isChannelDM := channel.Type == discord.DirectMessage || channel.Type == discord.GroupDM
+        shouldChime := cfg.Notifications.Sound.Enabled &amp;&amp; (!cfg.Notifications.Sound.OnlyOnPing || (isChannelDM || mentions.Has(ningen.MessageMentions|ningen.MessageNotifies)))
+        if err := sendDesktopNotification(title, content, imagePath, shouldChime, cfg.Notifications.Duration); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov0" title="0">return nil</span>
+}
+
+func getCachedProfileImage(avatarHash discord.Hash, url string) (string, error) <span class="cov0" title="0">{
+        path := filepath.Join(consts.CacheDir(), "avatars")
+        if err := os.MkdirAll(path, os.ModePerm); err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+
+        <span class="cov0" title="0">path = filepath.Join(path, avatarHash+".png")
+        if _, err := os.Stat(path); err == nil </span><span class="cov0" title="0">{
+                return path, nil
+        }</span>
+
+        <span class="cov0" title="0">file, err := os.Create(path)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov0" title="0">defer file.Close()
+
+        resp, err := http.Get(url)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov0" title="0">defer resp.Body.Close()
+
+        if _, err := io.Copy(file, resp.Body); err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+
+        <span class="cov0" title="0">return path, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file20" style="display: none">package ui
+
+import (
+        "strings"
+
+        "github.com/ayn2op/discordo/internal/config"
+        "github.com/ayn2op/tview"
+        "github.com/diamondburned/arikawa/v3/discord"
+)
+
+// ConfigureBox configures the provided box according to the provided theme.
+func ConfigureBox(box *tview.Box, cfg *config.Theme) *tview.Box <span class="cov0" title="0">{
+        border := cfg.Border
+        title := cfg.Title
+        normalBorderStyle, activeBorderStyle := border.NormalStyle.Style, border.ActiveStyle.Style
+        normalBorderSet, activeBorderSet := border.NormalSet.BorderSet, border.ActiveSet.BorderSet
+        normalTitleStyle, activeTitleStyle := title.NormalStyle.Style, title.ActiveStyle.Style
+        p := border.Padding
+        box.
+                SetBorderStyle(normalBorderStyle).
+                SetBorderSet(normalBorderSet).
+                SetBorderPadding(p[0], p[1], p[2], p[3]).
+                SetTitleStyle(normalTitleStyle).
+                SetTitleAlignment(title.Alignment.Alignment).
+                SetBlurFunc(func() </span><span class="cov0" title="0">{
+                        box.
+                                SetBorderStyle(normalBorderStyle).
+                                SetBorderSet(normalBorderSet)
+                        box.SetTitleStyle(normalTitleStyle)
+                }</span>).
+                SetFocusFunc(func() <span class="cov0" title="0">{
+                        box.
+                                SetBorderStyle(activeBorderStyle).
+                                SetBorderSet(activeBorderSet)
+                        box.SetTitleStyle(activeTitleStyle)
+                }</span>)
+
+        <span class="cov0" title="0">if border.Enabled </span><span class="cov0" title="0">{
+                box.SetBorders(tview.BordersAll)
+        }</span>
+
+        <span class="cov0" title="0">return box</span>
+}
+
+// Centered creates a new grid with provided primitive aligned in the center.
+func Centered(p tview.Primitive, width, height int) tview.Primitive <span class="cov0" title="0">{
+        return tview.NewGrid().
+                SetColumns(0, width, 0).
+                SetRows(0, height, 0).
+                AddItem(p, 1, 1, 1, 1, 0, 0, true)
+}</span>
+
+func ChannelToString(channel discord.Channel) string <span class="cov0" title="0">{
+        switch channel.Type </span>{
+        case discord.DirectMessage, discord.GroupDM:<span class="cov0" title="0">
+                if channel.Name != "" </span><span class="cov0" title="0">{
+                        return channel.Name
+                }</span>
+
+                <span class="cov0" title="0">recipients := make([]string, len(channel.DMRecipients))
+                for i, r := range channel.DMRecipients </span><span class="cov0" title="0">{
+                        recipients[i] = r.DisplayOrUsername()
+                }</span>
+
+                <span class="cov0" title="0">return strings.Join(recipients, ", ")</span>
+        case discord.GuildText:<span class="cov0" title="0">
+                return "#" + channel.Name</span>
+        case discord.GuildVoice, discord.GuildStageVoice:<span class="cov0" title="0">
+                return "v-" + channel.Name</span>
+        case discord.GuildAnnouncement:<span class="cov0" title="0">
+                return "a-" + channel.Name</span>
+        case discord.GuildStore:<span class="cov0" title="0">
+                return "s-" + channel.Name</span>
+        case discord.GuildForum:<span class="cov0" title="0">
+                return "f-" + channel.Name</span>
+        default:<span class="cov0" title="0">
+                return channel.Name</span>
+        }
+}
+</pre>
+		
+		<pre class="file" id="file21" style="display: none">package main
+
+import (
+        "log/slog"
+
+        "github.com/ayn2op/discordo/cmd"
+)
+
+func main() <span class="cov0" title="0">{
+        if err := cmd.Run(); err != nil </span><span class="cov0" title="0">{
+                slog.Error("failed to run command", "err", err)
+        }</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>
